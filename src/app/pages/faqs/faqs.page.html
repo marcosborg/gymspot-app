@@ -1,0 +1,17 @@
+<app-header></app-header>
+
+<ion-content>
+  <ion-text class="ion-text-center" color="primary">
+    <h1>FAQ's</h1>
+  </ion-text>
+  <ion-card *ngFor="let faq of faqs" color="secondary">
+    <ion-card-header (click)="toggleAnswer(faq.id)">
+      <strong><ion-text>{{ faq.question }}</ion-text></strong>
+    </ion-card-header>
+    <!-- Uso de *ngIf para mostrar/esconder baseado em isExpanded -->
+    <ion-card-content *ngIf="faq.isExpanded" class="ion-text-justify">
+      <hr style="background-color: #6d4ada;">
+      {{ faq.answer }}
+    </ion-card-content>
+  </ion-card>
+</ion-content>

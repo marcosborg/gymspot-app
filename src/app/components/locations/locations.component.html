@@ -1,0 +1,7 @@
+<ion-list>
+  <ion-item lines="none">
+    <ion-select aria-label="localizacoes" interface="action-sheet" placeholder="Outras localizações da GymSpot" class="ion-padding" (ionChange)="goLocation()" [(ngModel)]="location_id">
+      <ion-select-option value="{{ location.id }}" *ngFor="let location of locations">{{ location.title }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+</ion-list>

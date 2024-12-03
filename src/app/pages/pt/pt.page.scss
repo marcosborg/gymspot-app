@@ -1,0 +1,66 @@
+.profile-picture-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    background-size: cover;
+    background-position: center top;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+ion-icon {
+    font-size: 24px;
+    color: #3b5998;
+}
+
+a:nth-child(2) ion-icon {
+    color: #0077B5;
+}
+
+a:nth-child(3) ion-icon {
+    color: #C13584;
+}
+
+a:nth-child(4) ion-icon {
+    color: #010101;
+}
+
+.email-link {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 16px;
+    color: #ffffff;
+    /* Cor do link de e-mail */
+}
+
+.email-link ion-icon {
+    margin-right: 8px;
+    color: #6d4ada;
+    /* Cor do ícone de e-mail */
+}
+
+.email-link a {
+    color: inherit;
+    /* Herdar a cor do pai */
+    text-decoration: none;
+    /* Remover sublinhado */
+}
+
+.email-link a:hover {
+    text-decoration: underline;
+    /* Adicionar sublinhado ao passar o mouse */
+}

@@ -1,0 +1,46 @@
+<app-header></app-header>
+
+<ion-content *ngIf="pt">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ pt.name }}</ion-card-title>
+      <ion-card-subtitle>Personal trainer</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-note><strong class="ion-text-uppercase">{{ pt.certificate_type }}: </strong>{{ pt.professional_certificate }}</ion-note>
+      <div class="profile-picture-container">
+        <div class="profile-picture" style="background-image: url({{ pt.photos ? pt.photos[0].original_url : 'https://ionicframework.com/docs/img/demos/avatar.svg' }});"></div>
+      </div>
+      <div class="social-icons">
+        <a *ngIf="pt.facebook" href="{{ pt.facebook }}" target="_blank">
+          <ion-icon name="logo-facebook"></ion-icon>
+        </a>
+        <a *ngIf="pt.linkedin" href="{{ pt.linkedin }}" target="_blank">
+          <ion-icon name="logo-linkedin"></ion-icon>
+        </a>
+        <a *ngIf="pt.instagram" href="{{ pt.instagram }}" target="_blank">
+          <ion-icon name="logo-instagram"></ion-icon>
+        </a>
+        <a *ngIf="pt.tiktok" href="{{ pt.tiktok }}" target="_blank">
+          <ion-icon name="logo-tiktok"></ion-icon>
+        </a>
+      </div>
+      <div class="email-link">
+        <ion-icon name="mail-outline"></ion-icon>
+        <a [href]="'mailto:' + pt.email">{{ pt.email }}</a>
+      </div>
+      <div class="email-link">
+        <ion-icon name="call-outline"></ion-icon>
+        <a [href]="'tel:' + pt.phone">{{ pt.phone }}</a>
+      </div>
+      <div class="ion-margin-top">
+        <ion-badge (click)="goSpot(spot.id)" color="primary" style="margin: 2px;" *ngFor="let spot of pt.spots">{{ spot.name }}</ion-badge>
+      </div>
+      <h1 style="margin-top: 20px; font-size: 25px; font-weight: 700; color: #6d4ada; line-height: 16px;">{{ pt.price }}<small>€</small>
+        <br><span style="font-size: 12px; color: #cccccc; font-weight: normal;">(preço por meia hora)</span></h1>
+      <div class="ion-padding-top ion-text-justify" [innerHtml]="pt.description"></div>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
