@@ -2,3 +2,5 @@
 android
 node_modules
 www
+
+resources/ios/**/*

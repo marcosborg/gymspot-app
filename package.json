@@ -29,6 +29,7 @@
     "@capacitor/camera": "^6.1.1",
     "@capacitor/core": "latest",
     "@capacitor/haptics": "latest",
+    "@capacitor/ios": "6.2.0",
     "@capacitor/keyboard": "latest",
     "@capacitor/preferences": "^6.0.3",
     "@capacitor/status-bar": "latest",
