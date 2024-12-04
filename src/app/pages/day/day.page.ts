@@ -91,7 +91,6 @@ export class DayPage implements OnInit {
     this.api.getDay(data).subscribe(async (resp) => {
       await loading.dismiss();
       this.day = resp;
-      console.log(this.day);
       const storedSlots = await this.preferences.checkName('selected_slots');
       const storedSlotsValue = storedSlots?.value ?? '[]'; // Handle null by providing a default value
       this.selectedSlots = JSON.parse(storedSlotsValue);

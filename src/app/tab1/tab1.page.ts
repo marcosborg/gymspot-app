@@ -73,7 +73,6 @@ export class Tab1Page implements OnInit {
     });
     this.api.getSpots(10).subscribe((resp: any) => {
       this.spots = resp.data;
-      console.log(this.spots);
     });
   }
 

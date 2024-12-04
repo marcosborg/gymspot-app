@@ -100,7 +100,6 @@ export class FitnessGuidePage {
               html += 'O spot GymSpot onde me encontro, possui como equipamento: ' + equipment + '. '
               html += 'Com base nestas informações quero que me prepares um treino de fitness para hoje, adequado à minha realidade e objetivos, e com base no quipamento que te passei e que se encontra disponível neste spot.';
               this.request = html;
-              console.log(this.items);
               loading.dismiss();
             });
           });
