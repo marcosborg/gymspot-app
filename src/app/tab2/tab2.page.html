@@ -7,12 +7,19 @@
             <ion-button size="small" color="primary" routerLink="/tabs/tab3">Login</ion-button>
         </ion-card-content>
     </ion-card>
+    <div class="ion-padding ion-text-center" *ngIf="access_token">
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+            <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+        Arraste para refrescar as últimas marcações.
+    </div>
     <ion-list [inset]="true" *ngIf="access_token">
         <ion-item *ngFor="let rented_slot of rented_slots">
             <ion-label>
                 <strong>{{ rented_slot.spot.name }}</strong><br>
                 <ion-note color="medium" class="ion-text-wrap">
-                    {{ rented_slot.formattedStartDate }}<br>({{ rented_slot.formattedStartTime }} - {{ rented_slot.formattedEndTime }})
+                    {{ rented_slot.formattedStartDate }}<br>({{ rented_slot.formattedStartTime }} - {{
+                    rented_slot.formattedEndTime }})
                 </ion-note>
             </ion-label>
             <div class="metadata-end-wrapper" slot="end">

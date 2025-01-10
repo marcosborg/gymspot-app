@@ -92,8 +92,8 @@ export class CartPage {
               this.selectedSlots = JSON.parse(resp.value) || [];
               // Calcular o total
               this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
-                if(!slot.spot.sale){
-                return total + parseFloat(slot.spot.price);
+                if (!slot.spot.sale) {
+                  return total + parseFloat(slot.spot.price);
                 } else {
                   return total + parseFloat(slot.spot.sale);
                 }
@@ -157,11 +157,13 @@ export class CartPage {
               ],
               buttons: [
                 {
+                  text: 'Cancelar',
+                  role: 'cancel'
+                },
+                {
                   text: 'Continuar',
                   handler: (inputs) => {
-                    this.loadingController.create({
-                      message: 'Aguarde enquanto enviamos o pedido para o seu telemóvel. Assim que receber pode dar seguimento ao pagamento.'
-                    }).then((loading) => {
+                    this.loadingController.create().then((loading) => {
                       loading.present();
                       let data = {
                         access_token: this.access_token,
@@ -170,6 +172,28 @@ export class CartPage {
                         celphone: inputs.celphone
                       }
                       this.api.payByMbway(data).subscribe((resp: any) => {
+                        loading.dismiss();
+                        this.alertController.create({
+                          header: 'Pagamento Mbway',
+                          subHeader: 'Abra a aplicação MBWAY e autorize o pagamento.',
+                          message: 'Depois, volte à aplicação GymSpot e aceda ao separador RESERVAS para encontrar o seu código de acesso ao SPOT.',
+                          backdropDismiss: false,
+                          buttons: [
+                            {
+                              text: 'Ok',
+                              handler: () => {
+                                this.preferences.removeName('selected_slots').then(() => {
+                                  setTimeout(() => {
+                                    this.router.navigateByUrl('/tabs/tab2');
+                                  }, 500);
+                                });
+                              }
+                            }
+                          ]
+                        }).then((alert) => {
+                          alert.present();
+                        });
+                        /*
                         if (resp.Status == 100 || resp.Status == 122 || resp.Status == 999) {
                           loading.dismiss();
                           this.alertController.create({
@@ -258,7 +282,9 @@ export class CartPage {
                             });
                           }, 5000);
                         }
+                          */
                       }, (err) => {
+                        loading.dismiss();
                         this.alertController.create({
                           header: 'Erro no meio de pagamento',
                           message: 'Pode tentar novamente o checkout.',
@@ -276,10 +302,6 @@ export class CartPage {
                     });
                   }
                 },
-                {
-                  text: 'Cancelar',
-                  role: 'cancel'
-                }
               ]
             }).then((alert) => {
               alert.present();
