@@ -4,3 +4,4 @@ ios
 .angular
 node_modules
 www
+resources/android/**/*
