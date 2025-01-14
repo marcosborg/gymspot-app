@@ -26,7 +26,6 @@ import { LoadingController } from '@ionic/angular';
 import { PreferencesService } from '../services/preferences.service';
 import { Router } from '@angular/router';
 import { CartButtonComponent } from '../components/cart-button/cart-button.component';
-import { PushNotifications } from '@capacitor/push-notifications';
 
 @Component({
   selector: 'app-tab3',
@@ -159,7 +158,6 @@ export class Tab3Page implements OnInit {
               {
                 text: 'Continuar',
                 handler: () => {
-                  this.initPushNotifications();
                   this.inicialize();
                 }
               }
@@ -386,23 +384,4 @@ export class Tab3Page implements OnInit {
     });
   }
 
-  initPushNotifications() {
-    PushNotifications.requestPermissions().then(permission => {
-      if (permission.receive === 'granted') {
-        PushNotifications.register();
-      }
-    });
-  
-    // Escutar o evento de registo para obter o token
-    PushNotifications.addListener('registration', (registrationToken) => {
-      console.log('Token FCM do dispositivo:', registrationToken.value);
-  
-      // Enviar o token para o servidor
-      let data = {
-        fcm_token: registrationToken.value,
-        access_token: this.access_token
-      };
-      this.api.saveToken(data).subscribe();
-    });
-  }
 }
