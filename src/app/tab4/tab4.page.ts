@@ -66,9 +66,12 @@ export class Tab4Page {
   age: string = '';
   gender: string = '';
   primary_objective: string = '';
+  primary_type: string = '';
+  training_time: string = '';
   fitness_level: string = '';
   condition: string = '';
   condition_obs: string = '';
+  training_frequency: string = '';
 
   ionViewWillEnter() {
     this.inicialize();
@@ -117,10 +120,13 @@ export class Tab4Page {
         age: this.age,
         gender: this.gender,
         primary_objective: this.primary_objective,
+        primary_type: this.primary_type,
         fitness_level: this.fitness_level,
+        training_time: this.training_time,
         condition: this.condition,
         condition_obs: this.condition_obs,
-        access_token: this.access_token
+        access_token: this.access_token,
+        training_frequency: this.training_frequency
       }
       if (this.user.client.client_data) {
         //UPDATE
