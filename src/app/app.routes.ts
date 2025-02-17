@@ -53,6 +53,11 @@ export const routes: Routes = [
     path: 'fitness-guide',
     loadComponent: () => import('./pages/fitness-guide/fitness-guide.page').then( m => m.FitnessGuidePage)
   },
+  {
+    path: 'pack/:pack_id',
+    loadComponent: () => import('./pages/pack/pack.page').then( m => m.PackPage)
+  },
+
 
 
 ];

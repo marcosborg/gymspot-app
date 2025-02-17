@@ -41,6 +41,21 @@
     </swiper-slide>
   </swiper-container>
 
+  <swiper-container *ngIf="packs" pagination="true" autoplay="true" effect="coverflow" style="margin: 10px;"
+    [autoplay]="{ delay: 1500 }">
+    <swiper-slide *ngFor="let pack of packs"
+      style="background-image: url('{{ pack.image ? pack.image.original_url : '../../assets/placeholder.jpg' }}'); background-size: cover; border-radius: 10px; overflow: hidden;">
+      <div class="slider">
+        <h2 style="font-size: 18px;">
+          {{ pack.promo_title }}<br>
+          <span class="subtitle2">{{ pack.promo_description}}</span><br>
+          <ion-button size="small" color="primary" class="ion-margin-top" *ngFor="let about of abouts"
+            (click)="showPack(pack.id)">Ver pack</ion-button>
+        </h2>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+
   <ion-modal [isOpen]="isModalOpen" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.5, 0.75, 1]"
     (willDismiss)="cancel()">
     <ng-template>

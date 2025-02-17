@@ -54,6 +54,7 @@ export class Tab1Page implements OnInit {
   isGalleryOpen: any = false;
   personalTrainers: any = [];
   spots: any = [];
+  packs: any = [];
 
   ngOnInit() {
     this.api.getSliders().subscribe((resp: any) => {
@@ -73,6 +74,9 @@ export class Tab1Page implements OnInit {
     });
     this.api.getSpots(10).subscribe((resp: any) => {
       this.spots = resp.data;
+    });
+    this.api.packs().subscribe((resp: any) => {
+      this.packs = resp.data;
     });
   }
 
@@ -95,6 +99,10 @@ export class Tab1Page implements OnInit {
     if (soon == false) {
       this.router.navigateByUrl('/spot/' + spot_id);
     }
+  }
+
+  showPack(pack_id: any) {
+    this.router.navigateByUrl('/pack/' + pack_id);
   }
 
 }

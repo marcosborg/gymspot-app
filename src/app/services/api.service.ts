@@ -20,7 +20,7 @@ export class ApiService {
     }
   }
 
-  sandbox: boolean = false;
+  sandbox: boolean = true;
 
   url: any;
   protected_url: any;
@@ -294,6 +294,24 @@ export class ApiService {
       })
     };
     return this.http.post(this.auth_url + 'save-token', data, this.httpOptions);
+  }
+
+  myPacks(data: any) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Accept-Language': 'pt',
+        'Authorization': 'Bearer ' + data.access_token
+      })
+    };
+    return this.http.get(this.protected_url + 'my-packs', this.httpOptions);
+  }
+
+  packs() {
+    return this.http.get(this.url + 'packs');
+  }
+
+  pack(pack_id: any) {
+    return this.http.get(this.url + 'packs/' + pack_id);
   }
 
 }

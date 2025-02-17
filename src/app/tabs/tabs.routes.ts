@@ -27,6 +27,16 @@ export const routes: Routes = [
           import('../tab4/tab4.page').then((m) => m.Tab4Page),
       },
       {
+        path: 'tab5/:segment', // 🔹 Garante que o parâmetro `segment` seja reconhecido
+        loadComponent: () =>
+          import('../tab5/tab5.page').then((m) => m.Tab5Page),
+      },
+      {
+        path: 'tab5', // 🔹 Se acessar `/tabs/tab5` sem parâmetro, redireciona para `/tabs/tab5/all`
+        redirectTo: 'tab5/all',
+        pathMatch: 'full',
+      },
+      {
         path: '',
         redirectTo: '/tabs/tab1',
         pathMatch: 'full',
