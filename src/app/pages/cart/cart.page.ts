@@ -163,7 +163,7 @@ export class CartPage {
               this.api.payByBudget(data).subscribe((resp: any) => {
                 loading.dismiss();
                 this.alertController.create({
-                  header: 'Pagamento por Saldo',
+                  header: 'Pagamento com Saldo',
                   subHeader: 'O seu saldo será descontado',
                   message: 'Ao prosseguir concordo com os termos e condições expressos em gymspot.pt.',
                   backdropDismiss: false,
@@ -206,7 +206,7 @@ export class CartPage {
             this.alertController.create({
               header: 'Saldo de pack',
               subHeader: 'Saldo insuficiente!',
-              message: 'Deseja escolher um pack para utilizar como saldo?',
+              message: 'Deseja adquirir um pack para garantir mais treinos por um valor reduzido?',
               buttons: [
                 {
                   text: 'Não',
