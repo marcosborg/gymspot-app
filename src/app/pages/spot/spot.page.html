@@ -19,7 +19,7 @@
       </ion-note>
       <br>
       <ion-button size="small" fill="outline" color="primary" class="ion-margin-vertical"
-        (click)="setOpen(true)">Equipamentos</ion-button>
+        (click)="setOpen(true)">Exercícios</ion-button>
       <h1 *ngIf="!spot.sale"><ion-text color="primary">{{ spot.price }}<small>€</small></ion-text></h1>
       <h1 *ngIf="spot.sale"><ion-text color="primary">{{ spot.sale }}<small>€</small></ion-text> | <del style="font-size: 14px;">€{{ spot.price }}</del></h1>
       <span style="font-size: 12px;">(Por cada slot de 30 minutos - capacidade {{ spot.capacity }} utilizadores)</span>

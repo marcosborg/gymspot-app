@@ -85,6 +85,7 @@ export class FitnessGuidePage {
                 html += 'Não quero revelar o meu género.';
               }
               html += 'O meu objetivo principal é ' + this.user.client.client_data.primary_objective + ' e o meu nível de experiência com exercícios físicos é ' + this.user.client.client_data.fitness_level + '. ';
+              html += 'Quero trabalhar ' + this.user.client.client_data.primary_type + ' e tenho disponibilidade para treinar ' + this.user.client.client_data.training_time + '. ';
               if (this.user.client.client_data.condition || this.user.client.client_data.condition_obs) {
                 if (this.user.client.client_data.condition) {
                   html += 'Como condição de saúde tenho ' + this.user.client.client_data.condition + '. ';
@@ -95,8 +96,8 @@ export class FitnessGuidePage {
                   html += 'Como condição de saúde tenho ' + this.user.client.client_data.condition_obs;
                 }
               }
-              html += 'O spot GymSpot onde me encontro, possui como equipamento: ' + equipment + '. '
-              html += 'Com base nestas informações quero que me prepares um treino de fitness para hoje, adequado à minha realidade e objetivos, e com base no quipamento que te passei e que se encontra disponível neste spot.';
+              html += 'O spot GymSpot onde me encontro, possui equipamento que permite realizar os seguintes treinos: ' + equipment + '. '
+              html += 'Com base nestas informações quero que me prepares um treino de fitness para hoje, adequado à minha realidade e objetivos, e com base no quipamento e treinos que te passei e que se encontra disponível neste spot.';
               this.request = html;
               let data = {
                 access_token: this.access_token,

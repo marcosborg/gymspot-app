@@ -68,11 +68,16 @@ export class AppComponent implements OnInit {
     this.api.getSpots(3).subscribe((resp: any) => {
       this.spots = resp.data;
     });
+    this.api.getCategoryPages(1).subscribe((resp: any) => {
+      this.utils = resp.data;
+      console.log(this.utils);
+    });
   }
 
   menus: any = [];
   spots: any = [];
   pts: any = [];
+  utils: any = [];
 
   goSpot(spot_id: any, soon: any) {
     if (soon == false) {

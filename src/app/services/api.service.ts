@@ -20,7 +20,7 @@ export class ApiService {
     }
   }
 
-  sandbox: boolean = false;
+  sandbox: boolean = true;
 
   url: any;
   protected_url: any;
@@ -46,6 +46,10 @@ export class ApiService {
 
   getContentPage(content_page_id: any) {
     return this.http.get(this.url + 'content-pages/' + content_page_id);
+  }
+
+  getCategoryPages(content_category_id: any) {
+    return this.http.get(this.url + 'content-categories/' + content_category_id);
   }
 
   getAbouts() {

@@ -2,7 +2,7 @@
 
 <ion-content id="main-content">
   <div *ngIf="content_page">
-    <ion-img src="{{ content_page.featured_image.original_url }}"></ion-img>
+    <ion-img *ngIf="content_page.featured_image" src="{{ content_page.featured_image.original_url }}"></ion-img>
     <ion-card class="ion-text-justify ion-margin" color="secondary">
       <ion-card-header>
         <ion-card-title class="ion-text-left">

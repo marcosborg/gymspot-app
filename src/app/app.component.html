@@ -41,6 +41,13 @@
           <ion-list-header color="light">
             <ion-label>Mais informação</ion-label>
           </ion-list-header>
+          <ion-item button routerLink="cms/{{ util.id }}"
+            routerLinkActive="selected" *ngFor="let util of utils.pages" color="light">
+            <ion-label>{{ util.title }}</ion-label>
+          </ion-item>
+          <ion-list-header color="light">
+            <ion-label>Mais informação</ion-label>
+          </ion-list-header>
           <ion-item button routerLink="steps" routerLinkActive="selected" color="light">
             <ion-label>Como funciona</ion-label>
           </ion-item>

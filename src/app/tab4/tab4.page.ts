@@ -95,6 +95,9 @@ export class Tab4Page {
               this.fitness_level = this.user.client.client_data.fitness_level;
               this.condition = this.user.client.client_data.condition;
               this.condition_obs = this.user.client.client_data.condition_obs;
+              this.primary_type = this.user.client.client_data.primary_type;
+              this.training_time = this.user.client.client_data.training_time;
+              this.training_frequency = this.user.client.client_data.training_frequency;
             }
             loading.dismiss();
           });
@@ -117,16 +120,16 @@ export class Tab4Page {
     this.loadingController.create().then((loading) => {
       loading.present();
       let data = {
+        access_token: this.access_token,
         age: this.age,
         gender: this.gender,
+        fitness_level: this.fitness_level,
         primary_objective: this.primary_objective,
         primary_type: this.primary_type,
-        fitness_level: this.fitness_level,
         training_time: this.training_time,
+        training_frequency: this.training_frequency,
         condition: this.condition,
         condition_obs: this.condition_obs,
-        access_token: this.access_token,
-        training_frequency: this.training_frequency
       }
       if (this.user.client.client_data) {
         //UPDATE
