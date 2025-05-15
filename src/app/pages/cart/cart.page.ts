@@ -25,11 +25,13 @@ import {
   IonFooter,
   LoadingController,
   AlertController,
+  IonInput,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
+import { code } from 'ionicons/icons';
 
 registerLocaleData(localePt);
 
@@ -59,6 +61,7 @@ registerLocaleData(localePt);
     IonCardContent,
     IonButton,
     IonFooter,
+    IonInput,
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'pt' }]
 })
@@ -70,6 +73,9 @@ export class CartPage {
   buttons: any = [];
   myPacks: any = [];
   budget: number = 0;
+  promoCode: string = '';
+  validPromoCode: boolean = false;
+  helperText: string = '';
 
   constructor(
     private preferences: PreferencesService,
@@ -110,7 +116,7 @@ export class CartPage {
                 console.log(this.budget);
                 this.addButtons(this.budget).then(() => {
                   loading.dismiss();
-
+                  console.log(this.totalAmount);
                 });
               });
             }, 500);
@@ -156,7 +162,7 @@ export class CartPage {
           if (budget > 0 && this.selectedSlots.length <= budget) {
             let data = {
               access_token: this.access_token,
-              cart: JSON.stringify(this.selectedSlots)
+              cart: JSON.stringify(this.selectedSlots),
             }
             this.loadingController.create().then((loading) => {
               loading.present();
@@ -255,9 +261,15 @@ export class CartPage {
                     access_token: this.access_token,
                     cart: JSON.stringify(this.selectedSlots),
                     amount: this.totalAmount,
-                    celphone: inputs.celphone
+                    celphone: inputs.celphone,
+                    promoCode: {
+                      code: this.promoCode,
+                      validPromoCode: this.validPromoCode
+                    }
                   };
+                  console.log(data);
                   this.api.payByMbway(data).subscribe(async (resp: any) => {
+                    console.log(resp);
                     await loading.dismiss();
                     const successAlert = await this.alertController.create({
                       header: 'Pagamento Mbway',
@@ -308,6 +320,10 @@ export class CartPage {
             access_token: this.access_token,
             cart: JSON.stringify(this.selectedSlots),
             amount: this.totalAmount,
+            promoCode: {
+              code: this.promoCode,
+              validPromoCode: this.validPromoCode
+            }
           };
           this.api.payByMultibanco(data).subscribe(async (resp: any) => {
             await loading.dismiss();
@@ -364,7 +380,7 @@ export class CartPage {
           });
         }
       },
-      
+
       {
         text: 'Cancelar',
         role: 'cancel'
@@ -390,6 +406,45 @@ export class CartPage {
 
   goLogin() {
     this.router.navigateByUrl('tabs/tab3');
+  }
+
+  validatePromoCode() {
+    this.loadingController.create().then((loading) => {
+      loading.present();
+      let data = {
+        access_token: this.access_token,
+        code: this.promoCode
+      }
+      this.api.validatePromoCode(data).subscribe((resp: any) => {
+        this.helperText = resp.message;
+        if (resp.success == true && resp.data) {
+          this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value);
+        }
+        loading.dismiss();
+      }, (err) => {
+        loading.dismiss();
+        console.log(err);
+      });
+    });
+  }
+
+  applyPromoCode(totalAmount: any, type: any, value: any) {
+    let discount = 0;
+
+    if (type === 'percent') {
+      discount = totalAmount * value / 100;
+    } else {
+      discount = value;
+    }
+
+    // Garante que o desconto não é maior que o total
+    if (discount > totalAmount) {
+      discount = totalAmount;
+    }
+
+    this.totalAmount = totalAmount - discount;
+
+    this.validPromoCode = true;
   }
 
 }

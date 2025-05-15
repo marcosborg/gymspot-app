@@ -20,7 +20,7 @@ export class ApiService {
     }
   }
 
-  sandbox: boolean = false;
+  sandbox: boolean = true;
 
   url: any;
   protected_url: any;
@@ -326,6 +326,16 @@ export class ApiService {
 
   pack(pack_id: any) {
     return this.http.get(this.url + 'packs/' + pack_id);
+  }
+
+  validatePromoCode(data: any) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Accept-Language': 'pt',
+        'Authorization': 'Bearer ' + data.access_token
+      })
+    };
+    return this.http.post(this.protected_url + 'promo-codes/validate-promo-code', data, this.httpOptions);
   }
 
 }

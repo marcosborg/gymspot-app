@@ -16,6 +16,8 @@ import {
   IonButton,
   AlertController,
   ActionSheetController,
+  IonItem,
+  IonInput,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { ApiService } from 'src/app/services/api.service';
@@ -40,6 +42,8 @@ import { PreferencesService } from 'src/app/services/preferences.service';
     IonFooter,
     IonToolbar,
     IonButton,
+    IonItem,
+    IonInput,
   ]
 })
 export class PackPage {
@@ -57,6 +61,9 @@ export class PackPage {
   access_token: any;
   pack_id: any;
   pack: any;
+  promoCode: string = '';
+  validPromoCode: boolean = false;
+  helperText: string = '';
 
   ionViewWillEnter() {
     this.loadingController.create().then((loading) => {
@@ -117,7 +124,11 @@ export class PackPage {
                         access_token: this.access_token,
                         cart: JSON.stringify(this.pack),
                         amount: this.pack.price,
-                        celphone: inputs.celphone
+                        celphone: inputs.celphone,
+                        promoCode: {
+                          code: this.promoCode,
+                          validPromoCode: this.validPromoCode
+                        }
                       }
                       console.log(data);
                       this.api.payByMbway(data).subscribe((resp: any) => {
@@ -172,6 +183,10 @@ export class PackPage {
                 access_token: this.access_token,
                 cart: JSON.stringify(this.pack),
                 amount: this.pack.price,
+                promoCode: {
+                  code: this.promoCode,
+                  validPromoCode: this.validPromoCode
+                }
               }
               this.api.payByMultibanco(data).subscribe((resp: any) => {
                 loading.dismiss();
@@ -240,6 +255,45 @@ export class PackPage {
     }).then((action) => {
       action.present();
     });
+  }
+
+  validatePromoCode() {
+    this.loadingController.create().then((loading) => {
+      loading.present();
+      let data = {
+        access_token: this.access_token,
+        code: this.promoCode
+      }
+      this.api.validatePromoCode(data).subscribe((resp: any) => {
+        this.helperText = resp.message;
+        if (resp.success == true && resp.data) {
+          this.applyPromoCode(this.pack.price, resp.data.type, resp.data.value);
+        }
+        loading.dismiss();
+      }, (err) => {
+        loading.dismiss();
+        console.log(err);
+      });
+    });
+  }
+
+  applyPromoCode(packPrice: any, type: any, value: any) {
+    let discount = 0;
+
+    if (type === 'percent') {
+      discount = packPrice * value / 100;
+    } else {
+      discount = value;
+    }
+
+    // Garante que o desconto não é maior que o total
+    if (discount > packPrice) {
+      discount = packPrice;
+    }
+
+    this.pack.price = packPrice - discount;
+
+    this.validPromoCode = true;
   }
 
 }

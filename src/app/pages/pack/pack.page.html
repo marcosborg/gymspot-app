@@ -3,7 +3,10 @@
   <ion-img *ngIf="pack" src="{{ pack.image ? pack.image.original_url : '../../assets/placeholder.jpg' }}"></ion-img>
   <ion-card *ngIf="pack">
     <ion-card-header>
-        <ion-card-title>Apenas {{ pack.price }}<small>€</small><br><small>por {{ pack.quantity }} slots de 30 minutos</small></ion-card-title>
+        <ion-card-title>
+          Apenas {{ pack.price | number:'1.2-2' }}<small>€</small><br>
+          <small>por {{ pack.quantity }} slots de 30 minutos</small>
+        </ion-card-title>
         <ion-card-subtitle>{{ pack.promo_title }}</ion-card-subtitle>
     </ion-card-header>
 </ion-card>
@@ -14,6 +17,17 @@
     <div innerHtml="{{ pack.description }}"></div>
   </ion-card-content>
 </ion-card>
+<ion-card>
+        <ion-card-content>
+            <ion-item>
+                <ion-input [(ngModel)]="promoCode" labelPlacement="stacked" label="Código promocional"
+                    placeholder="Introduza um código válido" [helperText]="helperText">
+                    <ion-button fill="clear" slot="end" *ngIf="promoCode" (click)="validatePromoCode()">Validar codigo</ion-button>
+                </ion-input>
+            </ion-item>
+            
+        </ion-card-content>
+    </ion-card>
 </ion-content>
 
 <ion-footer *ngIf="pack">
