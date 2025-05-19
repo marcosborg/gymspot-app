@@ -26,6 +26,7 @@ import {
   LoadingController,
   AlertController,
   IonInput,
+  IonNote,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
@@ -62,6 +63,7 @@ registerLocaleData(localePt);
     IonButton,
     IonFooter,
     IonInput,
+    IonNote,
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'pt' }]
 })
@@ -76,6 +78,7 @@ export class CartPage {
   promoCode: string = '';
   validPromoCode: boolean = false;
   helperText: string = '';
+  promoCodeDescription: string = '';
 
   constructor(
     private preferences: PreferencesService,
@@ -267,7 +270,6 @@ export class CartPage {
                       validPromoCode: this.validPromoCode
                     }
                   };
-                  console.log(data);
                   this.api.payByMbway(data).subscribe(async (resp: any) => {
                     console.log(resp);
                     await loading.dismiss();
@@ -417,8 +419,9 @@ export class CartPage {
       }
       this.api.validatePromoCode(data).subscribe((resp: any) => {
         this.helperText = resp.message;
+        this.promoCodeDescription = resp.description;
         if (resp.success == true && resp.data) {
-          this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value);
+          this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value, resp.data.min_value);
         }
         loading.dismiss();
       }, (err) => {
@@ -428,23 +431,27 @@ export class CartPage {
     });
   }
 
-  applyPromoCode(totalAmount: any, type: any, value: any) {
-    let discount = 0;
+  applyPromoCode(totalAmount: any, type: any, value: any, minValue: any) {
 
-    if (type === 'percent') {
-      discount = totalAmount * value / 100;
-    } else {
-      discount = value;
+    if (this.validPromoCode == false && totalAmount >= minValue) {
+
+      let discount = 0;
+
+      if (type === 'percent') {
+        discount = totalAmount * value / 100;
+      } else {
+        discount = value;
+      }
+
+      // Garante que o desconto não é maior que o total
+      if (discount > totalAmount) {
+        discount = totalAmount;
+      }
+
+      this.totalAmount = totalAmount - discount;
+
+      this.validPromoCode = true;
     }
-
-    // Garante que o desconto não é maior que o total
-    if (discount > totalAmount) {
-      discount = totalAmount;
-    }
-
-    this.totalAmount = totalAmount - discount;
-
-    this.validPromoCode = true;
   }
 
 }

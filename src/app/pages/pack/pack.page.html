@@ -25,7 +25,9 @@
                     <ion-button fill="clear" slot="end" *ngIf="promoCode" (click)="validatePromoCode()">Validar codigo</ion-button>
                 </ion-input>
             </ion-item>
-            
+            <ion-item>
+              <ion-note>{{ promoCodeDescription }}</ion-note>
+            </ion-item>
         </ion-card-content>
     </ion-card>
 </ion-content>

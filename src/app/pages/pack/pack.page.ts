@@ -18,6 +18,7 @@ import {
   ActionSheetController,
   IonItem,
   IonInput,
+  IonNote,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { ApiService } from 'src/app/services/api.service';
@@ -44,6 +45,7 @@ import { PreferencesService } from 'src/app/services/preferences.service';
     IonButton,
     IonItem,
     IonInput,
+    IonNote,
   ]
 })
 export class PackPage {
@@ -64,6 +66,7 @@ export class PackPage {
   promoCode: string = '';
   validPromoCode: boolean = false;
   helperText: string = '';
+  promoCodeDescription: string = '';
 
   ionViewWillEnter() {
     this.loadingController.create().then((loading) => {
@@ -266,8 +269,9 @@ export class PackPage {
       }
       this.api.validatePromoCode(data).subscribe((resp: any) => {
         this.helperText = resp.message;
+        this.promoCodeDescription = resp.description;
         if (resp.success == true && resp.data) {
-          this.applyPromoCode(this.pack.price, resp.data.type, resp.data.value);
+          this.applyPromoCode(this.pack.price, resp.data.type, resp.data.value, resp.data.min_value);
         }
         loading.dismiss();
       }, (err) => {
@@ -277,23 +281,27 @@ export class PackPage {
     });
   }
 
-  applyPromoCode(packPrice: any, type: any, value: any) {
-    let discount = 0;
+  applyPromoCode(packPrice: any, type: any, value: any, minValue: any) {
 
-    if (type === 'percent') {
-      discount = packPrice * value / 100;
-    } else {
-      discount = value;
+    if (this.validPromoCode == false && packPrice >= minValue) {
+      let discount = 0;
+
+      if (type === 'percent') {
+        discount = packPrice * value / 100;
+      } else {
+        discount = value;
+      }
+
+      // Garante que o desconto não é maior que o total
+      if (discount > packPrice) {
+        discount = packPrice;
+      }
+
+      this.pack.price = packPrice - discount;
+
+      this.validPromoCode = true;
     }
 
-    // Garante que o desconto não é maior que o total
-    if (discount > packPrice) {
-      discount = packPrice;
-    }
-
-    this.pack.price = packPrice - discount;
-
-    this.validPromoCode = true;
   }
 
 }
