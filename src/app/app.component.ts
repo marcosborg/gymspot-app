@@ -70,7 +70,6 @@ export class AppComponent implements OnInit {
     });
     this.api.getCategoryPages(1).subscribe((resp: any) => {
       this.utils = resp.data;
-      console.log(this.utils);
     });
   }
 

@@ -116,10 +116,8 @@ export class CartPage {
               this.api.myPacks(data).subscribe((resp: any) => {
                 this.myPacks = resp;
                 this.budget = this.myPacks.reduce((total: number, pack: any) => total + pack.available, 0);
-                console.log(this.budget);
                 this.addButtons(this.budget).then(() => {
                   loading.dismiss();
-                  console.log(this.totalAmount);
                 });
               });
             }, 500);
@@ -271,7 +269,6 @@ export class CartPage {
                     }
                   };
                   this.api.payByMbway(data).subscribe(async (resp: any) => {
-                    console.log(resp);
                     await loading.dismiss();
                     const successAlert = await this.alertController.create({
                       header: 'Pagamento Mbway',

@@ -85,9 +85,6 @@ export class PackPage {
     });
   }
 
-  purchasePack(pack_id: any) {
-    console.log(pack_id);
-  }
   goLogin() {
     this.router.navigateByUrl('tabs/tab3');
   }
@@ -133,7 +130,6 @@ export class PackPage {
                           validPromoCode: this.validPromoCode
                         }
                       }
-                      console.log(data);
                       this.api.payByMbway(data).subscribe((resp: any) => {
                         loading.dismiss();
                         this.alertController.create({

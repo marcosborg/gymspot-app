@@ -94,7 +94,6 @@ export class Tab5Page implements OnInit {
             this.api.myPacks(data).subscribe((resp: any) => {
               this.myPacks = resp;
               loading.dismiss();
-              console.log(this.myPacks);
             });
           });
         }
