@@ -1,0 +1,247 @@
+<app-header></app-header>
+
+<ion-content *ngIf="spot && month">
+  <swiper-container pagination="true" autoplay="true">
+    <swiper-slide *ngFor="let photo of spot.photos">
+      <ion-img [src]="photo.original_url"></ion-img>
+    </swiper-slide>
+  </swiper-container>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ spot.name }}</ion-card-title>
+      <ion-card-subtitle>{{ spot.location.title }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-note>
+        <small>
+          {{ spot.address }} {{ spot.location.title }} {{ spot.zip }}
+        </small>
+      </ion-note>
+      <br>
+      <ion-button size="small" fill="outline" color="primary" class="ion-margin-vertical"
+        (click)="setOpen(true)">Exercícios</ion-button>
+      <h1 *ngIf="!spot.sale"><ion-text color="primary">{{ spot.price }}<small>€</small></ion-text></h1>
+      <h1 *ngIf="spot.sale"><ion-text color="primary">{{ spot.sale }}<small>€</small></ion-text> | <del style="font-size: 14px;">€{{ spot.price }}</del></h1>
+      <span style="font-size: 12px;">(Por cada slot de 30 minutos - capacidade {{ spot.capacity }} utilizadores)</span>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-content>
+      <h1><ion-text color="primary">Lembre-se!</ion-text></h1>
+      <div class="ion-text-justify">
+        <p>Pode também reservar um personal trainer para o ajudar a tirar o máximo proveito do seu treino!</p>
+        <p>Consulte as suas opções na secção PT.</p>
+        <p><ion-text color="primary">Reserve diretamente por telefone ou email.</ion-text></p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-modal [isOpen]="isModalOpen">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>{{ spot.name }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="setOpen(false)">Fechar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <div [innerHtml]="spot.description" class="ion-text-justify"></div>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="3" *ngFor="let item of spot.items">
+            <div>
+              <ion-img src="{{ item.icon.thumbnail }}"></ion-img>
+              <p class="item ion-text-center">{{ item.name }}</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-content>
+  </ion-modal>
+
+  <ion-modal [isOpen]="isCalendarOpen" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75]">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Selecione o dia</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="ion-text-center grid ion-margin">
+        <div class="row" style="background: var(--ion-color-primary); color: #ffffff; align-items: center;">
+          <div class="col ion-text-left" (click)="changeMonth(month.previousMonthLink)"><strong><ion-icon
+                name="chevron-back-circle-outline"></ion-icon></strong></div>
+          <div class="col"><strong style="text-transform: capitalize;">{{ month.name }}<br><small>{{ month.year
+                }}</small></strong></div>
+          <div class="col ion-text-right" (click)="changeMonth(month.nextMonthLink)"><strong><ion-icon
+                name="chevron-forward-circle-outline"></ion-icon></strong></div>
+        </div>
+        <div class="row">
+          <div class="col"><strong>Seg</strong></div>
+          <div class="col"><strong>Ter</strong></div>
+          <div class="col"><strong>Qua</strong></div>
+          <div class="col"><strong>Qui</strong></div>
+          <div class="col"><strong>Sex</strong></div>
+          <div class="col"><strong>Sáb</strong></div>
+          <div class="col"><strong>Dom</strong></div>
+        </div>
+        <div class="row">
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[0].year, month.daysWithWeekday[0].month, month.daysWithWeekday[0].dayNumber)"
+            class="{{ month.daysWithWeekday[0].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[0].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[1].year, month.daysWithWeekday[1].month, month.daysWithWeekday[1].dayNumber)"
+            class="{{ month.daysWithWeekday[1].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[1].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[2].year, month.daysWithWeekday[2].month, month.daysWithWeekday[2].dayNumber)"
+            class="{{ month.daysWithWeekday[2].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[2].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[3].year, month.daysWithWeekday[3].month, month.daysWithWeekday[3].dayNumber)"
+            class="{{ month.daysWithWeekday[3].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[3].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[4].year, month.daysWithWeekday[4].month, month.daysWithWeekday[4].dayNumber)"
+            class="{{ month.daysWithWeekday[4].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[4].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[5].year, month.daysWithWeekday[5].month, month.daysWithWeekday[5].dayNumber)"
+            class="{{ month.daysWithWeekday[5].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[5].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[6].year, month.daysWithWeekday[6].month, month.daysWithWeekday[6].dayNumber)"
+            class="{{ month.daysWithWeekday[6].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[6].dayNumber }}</div>
+        </div>
+        <div class="row">
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[7].year, month.daysWithWeekday[7].month, month.daysWithWeekday[7].dayNumber)"
+            class="{{ month.daysWithWeekday[7].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[7].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[8].year, month.daysWithWeekday[8].month, month.daysWithWeekday[8].dayNumber)"
+            class="{{ month.daysWithWeekday[8].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[8].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[9].year, month.daysWithWeekday[9].month, month.daysWithWeekday[9].dayNumber)"
+            class="{{ month.daysWithWeekday[9].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[9].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[10].year, month.daysWithWeekday[10].month, month.daysWithWeekday[10].dayNumber)"
+            class="{{ month.daysWithWeekday[10].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[10].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[11].year, month.daysWithWeekday[11].month, month.daysWithWeekday[11].dayNumber)"
+            class="{{ month.daysWithWeekday[11].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[11].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[12].year, month.daysWithWeekday[12].month, month.daysWithWeekday[12].dayNumber)"
+            class="{{ month.daysWithWeekday[12].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[12].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[13].year, month.daysWithWeekday[13].month, month.daysWithWeekday[13].dayNumber)"
+            class="{{ month.daysWithWeekday[13].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[13].dayNumber }}</div>
+        </div>
+        <div class="row">
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[14].year, month.daysWithWeekday[14].month, month.daysWithWeekday[14].dayNumber)"
+            class="{{ month.daysWithWeekday[14].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[14].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[15].year, month.daysWithWeekday[15].month, month.daysWithWeekday[15].dayNumber)"
+            class="{{ month.daysWithWeekday[15].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[15].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[16].year, month.daysWithWeekday[16].month, month.daysWithWeekday[16].dayNumber)"
+            class="{{ month.daysWithWeekday[16].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[16].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[17].year, month.daysWithWeekday[17].month, month.daysWithWeekday[17].dayNumber)"
+            class="{{ month.daysWithWeekday[17].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[17].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[18].year, month.daysWithWeekday[18].month, month.daysWithWeekday[18].dayNumber)"
+            class="{{ month.daysWithWeekday[18].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[18].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[19].year, month.daysWithWeekday[19].month, month.daysWithWeekday[19].dayNumber)"
+            class="{{ month.daysWithWeekday[19].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[19].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[20].year, month.daysWithWeekday[20].month, month.daysWithWeekday[20].dayNumber)"
+            class="{{ month.daysWithWeekday[20].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[20].dayNumber }}</div>
+        </div>
+        <div class="row">
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[21].year, month.daysWithWeekday[21].month, month.daysWithWeekday[21].dayNumber)"
+            class="{{ month.daysWithWeekday[21].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[21].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[22].year, month.daysWithWeekday[22].month, month.daysWithWeekday[22].dayNumber)"
+            class="{{ month.daysWithWeekday[22].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[22].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[23].year, month.daysWithWeekday[23].month, month.daysWithWeekday[23].dayNumber)"
+            class="{{ month.daysWithWeekday[23].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[23].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[24].year, month.daysWithWeekday[24].month, month.daysWithWeekday[24].dayNumber)"
+            class="{{ month.daysWithWeekday[24].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[24].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[25].year, month.daysWithWeekday[25].month, month.daysWithWeekday[25].dayNumber)"
+            class="{{ month.daysWithWeekday[25].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[25].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[26].year, month.daysWithWeekday[26].month, month.daysWithWeekday[26].dayNumber)"
+            class="{{ month.daysWithWeekday[26].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[26].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[27].year, month.daysWithWeekday[27].month, month.daysWithWeekday[27].dayNumber)"
+            class="{{ month.daysWithWeekday[27].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[27].dayNumber }}</div>
+        </div>
+        <div class="row">
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[28].year, month.daysWithWeekday[28].month, month.daysWithWeekday[28].dayNumber)"
+            class="{{ month.daysWithWeekday[28].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[28].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[29].year, month.daysWithWeekday[29].month, month.daysWithWeekday[29].dayNumber)"
+            class="{{ month.daysWithWeekday[29].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[29].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[30].year, month.daysWithWeekday[30].month, month.daysWithWeekday[30].dayNumber)"
+            class="{{ month.daysWithWeekday[30].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[30].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[31].year, month.daysWithWeekday[31].month, month.daysWithWeekday[31].dayNumber)"
+            class="{{ month.daysWithWeekday[31].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[31].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[32].year, month.daysWithWeekday[32].month, month.daysWithWeekday[32].dayNumber)"
+            class="{{ month.daysWithWeekday[32].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[32].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[33].year, month.daysWithWeekday[33].month, month.daysWithWeekday[33].dayNumber)"
+            class="{{ month.daysWithWeekday[33].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[33].dayNumber }}</div>
+          <div class="col"
+            (click)="goDay(month.daysWithWeekday[34].year, month.daysWithWeekday[34].month, month.daysWithWeekday[34].dayNumber)"
+            class="{{ month.daysWithWeekday[34].status == 'active' ? 'active' : 'inactive' }}">{{
+            month.daysWithWeekday[34].dayNumber }}</div>
+        </div>
+      </div>
+    </ion-content>
+  </ion-modal>
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-button expand="full" fill="clear" color="light" (click)="isCalendarOpen = !isCalendarOpen">Agendar</ion-button>
+  </ion-toolbar>
+</ion-footer>

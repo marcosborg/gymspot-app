@@ -1,0 +1,50 @@
+<app-header></app-header>
+
+<ion-content>
+    <ion-card>
+        <ion-card-header>
+            <ion-card-title>Carrinho</ion-card-title>
+            <ion-card-subtitle>Confirme as suas reservas</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+            <p class="ion-padding-bottom"><strong>Valor a pagar: </strong>{{ totalAmount |
+                currency:'EUR':'symbol':'1.2-2' }}</p>
+            <ion-list>
+                <ion-item-sliding *ngFor="let selectedSlot of selectedSlots; let i = index; let last = last">
+                    <ion-item [lines]="last ? 'none' : 'full'">
+                        <ion-label>
+                            {{ selectedSlot.spot.name }}<br>{{ selectedSlot.timestamp | date: 'fullDate' : '' : 'pt' }}
+                        </ion-label>
+                        {{ selectedSlot.start }} - {{ selectedSlot.end }}
+                    </ion-item>
+                    <ion-item-options>
+                        <ion-item-option color="primary" (click)="removeFromCart(i)">Remover do
+                            carrinho</ion-item-option>
+                    </ion-item-options>
+                </ion-item-sliding>
+            </ion-list>
+        </ion-card-content>
+        <ion-button (click)="deleteCart()" fill="clear" color="light">Apagar carrinho</ion-button>
+    </ion-card>
+    <ion-card>
+        <ion-card-content>
+            <ion-item>
+                <ion-input [(ngModel)]="promoCode" labelPlacement="stacked" label="Código promocional"
+                    placeholder="Introduza um código válido" [helperText]="helperText">
+                    <ion-button fill="clear" slot="end" *ngIf="promoCode" (click)="validatePromoCode()">Validar codigo</ion-button>
+                </ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-note>{{ promoCodeDescription }}</ion-note>
+            </ion-item>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
+<ion-footer>
+    <ion-toolbar color="primary">
+        <ion-button expand="full" fill="clear" color="light" (click)="goLogin()" *ngIf="!access_token">Fazer login antes
+            de pagar</ion-button>
+        <ion-button expand="full" fill="clear" color="light" (click)="pay()" *ngIf="access_token">Finalizar a reserva e
+            pagar</ion-button>
+    </ion-toolbar>
+</ion-footer>

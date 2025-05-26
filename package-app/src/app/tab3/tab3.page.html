@@ -1,0 +1,129 @@
+<app-header></app-header>
+
+<ion-content>
+    <div *ngIf="!access_token">
+        <ion-card *ngIf="create">
+            <ion-card-header>
+                <h1 class="ion-text-center">Criar conta</h1>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-list class="ion-margin-top">
+                    <ion-item>
+                        <ion-input [(ngModel)]="user.name" label="Nome" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="user.password" type="password" label="Password"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input [(ngModel)]="user.password_confirmation" type="password"
+                            label="Repetição da password" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                </ion-list>
+                <ion-button *ngIf="!access_token" expand="block" class="ion-margin-top" (click)="register()">Criar
+                    conta</ion-button>
+                <ion-button class="ion-margin" size="small" fill="clear" expand="full" (click)="create = !create">Já
+                    possuo conta</ion-button>
+            </ion-card-content>
+        </ion-card>
+        <ion-card *ngIf="!create">
+            <ion-card-header>
+                <h1 class="ion-text-center">Login</h1>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-list class="ion-margin-top">
+                    <ion-item>
+                        <ion-input [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input [(ngModel)]="user.password" type="Password" label="Password"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                </ion-list>
+                <ion-button expand="block" class="ion-margin-top" (click)="login()">Login</ion-button>
+                <ion-button class="ion-margin" size="small" fill="clear" expand="full" (click)="create = !create">Criar
+                    conta</ion-button>
+            </ion-card-content>
+        </ion-card>
+    </div>
+    <div *ngIf="access_token">
+        <ion-card>
+            <ion-card-header>
+                <h1 class="ion-text-center">Atualizar conta</h1>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-list class="ion-margin-top">
+                    <ion-item>
+                        <ion-input [(ngModel)]="user.name" label="Nome" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input disabled [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="password" type="password" label="Password"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input [(ngModel)]="password_confirmation" type="password" label="Repetição da password"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                </ion-list>
+                <ion-button expand="block" class="ion-margin-top" (click)="updateUser()">Atualizar
+                    conta</ion-button>
+                <ion-button class="ion-margin" size="small" fill="clear" expand="full"
+                    (click)="logout()">Logout</ion-button>
+                <ion-button class="ion-margin" color="danger" size="small" fill="clear" expand="full"
+                    (click)="delAccount()"><small>Eliminar
+                        conta</small></ion-button>
+            </ion-card-content>
+        </ion-card>
+        <ion-card>
+            <ion-card-header>
+                <h1 class="ion-text-center">Dados adicionais e de faturação</h1>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-list class="ion-margin-top">
+                    <ion-item>
+                        <ion-input [(ngModel)]="client.name" label="Nome de faturação"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="client.zip" label="Código postal" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="client.location" label="Localidade"
+                            labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select label="País" placeholder="Escolher" labelPlacement="stacked"
+                            [(ngModel)]="client.country_id">
+                            <ion-select-option *ngFor="let country of countries" [value]="country.id">{{ country.name
+                                }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [(ngModel)]="client.phone" label="Telefone" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input [(ngModel)]="client.vat" label="Contribuinte" labelPlacement="stacked"></ion-input>
+                    </ion-item>
+                </ion-list>
+                <ion-button expand="block" class="ion-margin-top" (click)="updateClient()">Atualizar
+                    conta</ion-button>
+            </ion-card-content>
+        </ion-card>
+        <ion-card>
+            <ion-card-header *ngIf="!user.personal_trainer">
+                <h1 class="ion-text-center">Fazer upgrade para Personal trainer</h1>
+            </ion-card-header>
+            <ion-card-content>
+                <ion-button color="primary" expand="block" (click)="goPersonalTrainer()">Ir para área de personal
+                    trainer</ion-button>
+            </ion-card-content>
+        </ion-card>
+        <app-cart-button />
+    </div>
+</ion-content>

@@ -1,0 +1,18 @@
+<app-header></app-header>
+
+<ion-content>
+  <h1 class="ion-text-center">PTs</h1>
+  <ion-list>
+    <ion-item button *ngFor="let pt of pts; last as isLast" [lines]="isLast ? 'none' : ''" routerLink="/pt/{{ pt.id }}">
+      <ion-avatar slot="start">
+        <ion-img src="{{ pt.photos ? pt.photos[0].original_url : 'https://ionicframework.com/docs/img/demos/avatar.svg' }}"></ion-img>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ pt.name }}</h2>
+        <p>
+          <ion-badge style="font-size: 10px; margin-left: 2px;" color="primary" slot="start" *ngFor="let spot of pt.spots">{{ spot.name }}</ion-badge>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
