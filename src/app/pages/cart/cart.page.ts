@@ -418,7 +418,7 @@ export class CartPage {
         this.helperText = resp.message;
         this.promoCodeDescription = resp.description;
         if (resp.success == true && resp.data) {
-          this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value, resp.data.min_value);
+          this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value, resp.data.min_value, resp.data.promo);
         }
         loading.dismiss();
       }, (err) => {
@@ -428,9 +428,9 @@ export class CartPage {
     });
   }
 
-  applyPromoCode(totalAmount: any, type: any, value: any, minValue: any) {
+  applyPromoCode(totalAmount: any, type: any, value: any, minValue: any, promo: any ) {
 
-    if (this.validPromoCode == false && totalAmount >= minValue) {
+    if (this.validPromoCode == false && totalAmount >= minValue && promo == 'slots') {
 
       let discount = 0;
 
