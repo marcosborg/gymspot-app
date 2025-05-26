@@ -267,7 +267,7 @@ export class PackPage {
         this.helperText = resp.message;
         this.promoCodeDescription = resp.description;
         if (resp.success == true && resp.data) {
-          this.applyPromoCode(this.pack.price, resp.data.type, resp.data.value, resp.data.min_value);
+          this.applyPromoCode(this.pack.price, resp.data.type, resp.data.value, resp.data.min_value, resp.data.promo, resp.data.pack_id);
         }
         loading.dismiss();
       }, (err) => {
@@ -277,9 +277,9 @@ export class PackPage {
     });
   }
 
-  applyPromoCode(packPrice: any, type: any, value: any, minValue: any) {
+  applyPromoCode(packPrice: any, type: any, value: any, minValue: any, promo: any, pack_id: any) {
 
-    if (this.validPromoCode == false && packPrice >= minValue) {
+    if (this.validPromoCode == false && packPrice >= minValue && promo == 'packs' && pack_id == this.pack_id) {
       let discount = 0;
 
       if (type === 'percent') {
