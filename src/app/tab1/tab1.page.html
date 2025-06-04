@@ -12,13 +12,13 @@
           <ion-card-subtitle style="color: #cccccc; font-size: 12px;">{{ spot.location.title }}</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <div *ngIf="!spot.soon">
+          <div *ngIf="spot.soon == 0">
             <h2>
               <span *ngIf="!spot.sale" style="color: #ffffff; font-size: 25px;">€{{ spot.price }}</span>
               <span *ngIf="spot.sale" style="color: #ffffff; font-size: 25px;"><del style="font-size: 14px;">€{{ spot.price }}</del><br>€{{ spot.sale }}</span>
               <span style="font-size: 12px;"><br>slot de 30 minutos</span></h2>
           </div>
-          <div *ngIf="spot.soon">
+          <div *ngIf="spot.soon == 1">
             <h3 style="padding: 4vh 0;">BREVEMENTE</h3>
           </div>
         </ion-card-content>
@@ -85,9 +85,9 @@
           <ion-card-title style="font-size: 18px;">{{ location.title }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-button *ngIf="!location.soon" color="primary" size="small" class="ion-float-right ion-margin-bottom"
+          <ion-button *ngIf="location.soon == 0" color="primary" size="small" class="ion-float-right ion-margin-bottom"
             (click)="router.navigateByUrl('location/' + location.id)">Reserve já</ion-button>
-          <h4 *ngIf="location.soon" class="primary">BREVEMENTE</h4>
+          <h4 *ngIf="location.soon == 1" class="primary">BREVEMENTE</h4>
         </ion-card-content>
       </ion-card>
     </swiper-slide>
