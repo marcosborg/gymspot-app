@@ -36,7 +36,7 @@
             <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
                 <ion-refresher-content></ion-refresher-content>
             </ion-refresher>
-            Arraste para refrescar as últimas marcações.
+            Arraste para refrescar os packs disponíveis.
         </div>
         <ion-list>
             <ion-item *ngFor="let myPack of myPacks; let last = last" [lines]="last ? 'none' : 'inset'">
