@@ -445,7 +445,7 @@ export class CartPage {
   validatePromoCode() {
     this.loadingController.create().then((loading) => {
       loading.present();
-      const data = { access_token: this.access_token, code: this.promoCode };
+      const data = { access_token: this.access_token, code: this.promoCode, value: this.totalAmount };
       this.api.validatePromoCode(data).subscribe((resp: any) => {
         this.helperText = resp.message;
         this.promoCodeDescription = resp.description;
