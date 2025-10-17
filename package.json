@@ -29,6 +29,7 @@
     "@capacitor/camera": "^7.0.2",
     "@capacitor/core": "latest",
     "@capacitor/haptics": "latest",
+    "@capacitor/ios": "7.4.3",
     "@capacitor/keyboard": "latest",
     "@capacitor/preferences": "^7.0.2",
     "@capacitor/status-bar": "latest",
@@ -66,5 +67,12 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.0"
-  }
+  },
+  "browserslist": [
+    "Chrome >=107",
+    "Firefox >=106",
+    "Edge >=107",
+    "Safari >=16.1",
+    "iOS >=16.1"
+  ]
 }
