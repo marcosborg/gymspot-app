@@ -1,0 +1,40 @@
+<app-header></app-header>
+<ion-content>
+  <ion-img *ngIf="pack" src="{{ pack.image ? pack.image.original_url : '../../assets/placeholder.jpg' }}"></ion-img>
+  <ion-card *ngIf="pack">
+    <ion-card-header>
+        <ion-card-title>
+          Apenas {{ pack.price | number:'1.2-2' }}<small>€</small><br>
+          <small>por {{ pack.quantity }} slots de 30 minutos</small>
+        </ion-card-title>
+        <ion-card-subtitle>{{ pack.promo_title }}</ion-card-subtitle>
+    </ion-card-header>
+</ion-card>
+<ion-card *ngIf="pack && pack.description">
+  <ion-card-content>
+    <p>{{ pack.promo_description }}</p>
+    <hr style="background-color: #6d4ada;">
+    <div innerHtml="{{ pack.description }}"></div>
+  </ion-card-content>
+</ion-card>
+<ion-card>
+        <ion-card-content>
+            <ion-item>
+                <ion-input [(ngModel)]="promoCode" labelPlacement="stacked" label="Código promocional"
+                    placeholder="Introduza um código válido" [helperText]="helperText">
+                    <ion-button fill="clear" slot="end" *ngIf="promoCode" (click)="validatePromoCode()">Validar codigo</ion-button>
+                </ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-note>{{ promoCodeDescription }}</ion-note>
+            </ion-item>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
+
+<ion-footer *ngIf="pack">
+  <ion-toolbar color="primary">
+      <ion-button expand="full" fill="clear" color="light" (click)="goLogin()" *ngIf="!access_token">Fazer login para poder comprar</ion-button>
+      <ion-button expand="full" fill="clear" color="light" (click)="pay()" *ngIf="access_token">Comprar já</ion-button>
+  </ion-toolbar>
+</ion-footer>

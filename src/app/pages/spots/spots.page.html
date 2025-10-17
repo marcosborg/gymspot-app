@@ -1,0 +1,15 @@
+<app-header></app-header>
+
+<ion-content>
+  <h1 class="ion-text-center">Spots</h1>
+  <ion-list>
+    <ion-item button *ngFor="let spot of spots; last as isLast" [lines]="isLast ? 'none' : ''" (click)="goSpot(spot.id, spot.soon)">
+      <ion-avatar slot="start"><ion-img
+          src="{{ spot.photos ? spot.photos[0].original_url : 'https://ionicframework.com/docs/img/demos/avatar.svg' }}"></ion-img></ion-avatar>
+      <ion-label>
+        <h2>{{ spot.name }}</h2>
+        <p>{{ spot.location.title }}<ion-note *ngIf="spot.soon" style="font-size: 10px;"> | BREVEMENTE</ion-note></p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

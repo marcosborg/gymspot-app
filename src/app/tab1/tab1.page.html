@@ -1,0 +1,144 @@
+<app-header></app-header>
+
+<ion-content>
+
+  <swiper-container *ngIf="spots" pagination="false" autoplay="true" slides-per-view="2" [autoplay]="{ delay: 2500 }">
+    <swiper-slide *ngFor="let spot of spots">
+      <ion-card (click)="goSpot(spot.id, spot.soon)"
+        style="background: url('{{ spot.photos[0].original_url }}') center center; background-size: cover;"
+        class="location-card">
+        <ion-card-header>
+          <ion-card-title style="font-size: 18px;">{{ spot.name }}</ion-card-title>
+          <ion-card-subtitle style="color: #cccccc; font-size: 12px;">{{ spot.location.title }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="spot.soon == 0">
+            <h2>
+              <span *ngIf="!spot.sale" style="color: #ffffff; font-size: 25px;">€{{ spot.price }}</span>
+              <span *ngIf="spot.sale" style="color: #ffffff; font-size: 25px;"><del style="font-size: 14px;">€{{ spot.price }}</del><br>€{{ spot.sale }}</span>
+              <span style="font-size: 12px;"><br>slot de 30 minutos</span></h2>
+          </div>
+          <div *ngIf="spot.soon == 1">
+            <h3 style="padding: 4vh 0;">BREVEMENTE</h3>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+
+  <swiper-container *ngIf="sliders" pagination="true" autoplay="true" effect="coverflow" style="margin: 10px;"
+    [autoplay]="{ delay: 2000 }">
+    <swiper-slide *ngFor="let slide of sliders"
+      style="background-image: url('{{ slide.image.original_url }}'); background-size: cover; border-radius: 10px; overflow: hidden;">
+      <div class="slider">
+        <h2 style="font-size: 25px;">
+          {{ slide.title }}<br>
+          <span class="subtitle">{{ slide.subtitle }}</span><br>
+          <ion-button size="small" color="primary" class="ion-margin-top" *ngFor="let about of abouts"
+            (click)="showAbout(about.text, about.image.original_url)">Saber mais</ion-button>
+        </h2>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+
+  <swiper-container *ngIf="packs" pagination="true" autoplay="true" effect="coverflow" style="margin: 10px;"
+    [autoplay]="{ delay: 1500 }">
+    <swiper-slide *ngFor="let pack of packs"
+      style="background-image: url('{{ pack.image ? pack.image.original_url : '../../assets/placeholder.jpg' }}'); background-size: cover; border-radius: 10px; overflow: hidden;">
+      <div class="slider">
+        <h2 style="font-size: 18px;">
+          {{ pack.promo_title }}<br>
+          <span class="subtitle2">{{ pack.promo_description}}</span><br>
+          <ion-button size="small" color="primary" class="ion-margin-top" *ngFor="let about of abouts"
+            (click)="showPack(pack.id)">Ver pack</ion-button>
+        </h2>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+
+  <ion-modal [isOpen]="isModalOpen" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.5, 0.75, 1]"
+    (willDismiss)="cancel()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Fechar</ion-button>
+          </ion-buttons>
+          <ion-title class="ion-text-center">
+            <ion-img src="../../assets/logo-dark-v2.png" class="logo"></ion-img>
+          </ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <p [innerHtml]="text" class="ion-text-justify"></p>
+        <ion-img [src]="image"></ion-img>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <swiper-container *ngIf="locations" pagination="false" autoplay="true" slides-per-view="2">
+    <swiper-slide *ngFor="let location of locations">
+      <ion-card style="background: url('{{ location.image.original_url }}') center center; background-size: cover;"
+        class="location-card">
+        <ion-card-header>
+          <ion-card-subtitle style="font-size: 12px;">{{ location.subtitle }}</ion-card-subtitle>
+          <ion-card-title style="font-size: 18px;">{{ location.title }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-button *ngIf="location.soon == 0" color="primary" size="small" class="ion-float-right ion-margin-bottom"
+            (click)="router.navigateByUrl('location/' + location.id)">Reserve já</ion-button>
+          <h4 *ngIf="location.soon == 1" class="primary">BREVEMENTE</h4>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+
+  <swiper-container *ngIf="personalTrainers" slides-per-view="2" autoplay="true" [autoplay]="{ delay: 1700 }">
+    <swiper-slide *ngFor="let pt of personalTrainers">
+      <ion-card routerLink="/pt/{{ pt.id }}">
+        <div class="ion-text-center">
+          <div class="thumbnail"
+            style="background-image: url({{ pt.photos.length > 0 ? pt.photos[0].original_url : 'https://ionicframework.com/docs/img/demos/thumbnail.svg' }});">
+          </div>
+        </div>
+        <ion-card-header class="ion-text-center">
+          <ion-card-title style="font-size: 14px;">{{ pt.name }}</ion-card-title>
+          <ion-card-subtitle style="font-size: 12px;">Personal trainer</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content class="ion-text-center">
+          <h2 style="line-height: 14px;"><span style="color: #6d4ada; font-size: 25px;">€{{ pt.price }}</span><span
+              style="font-size: 12px;"><br>por 30 minutos</span></h2>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+
+  <swiper-container *ngIf="galleries" pagination="false" autoplay="true" slides-per-view="2">
+    <swiper-slide *ngFor="let gallery of galleries">
+      <ion-card>
+        <ion-img src="{{ gallery.image.original_url }}" (click)="openGallery(gallery.id)"></ion-img>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+
+  <ion-modal [isOpen]="isGalleryOpen" (willDismiss)="cancel()" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Galeria</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="isGalleryOpen = false">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <swiper-container *ngIf="galleries" pagination="true" autoplay="false">
+          <swiper-slide *ngFor="let gallery of galleries">
+            <ion-img src="{{ gallery.image.original_url }}"></ion-img>
+          </swiper-slide>
+        </swiper-container>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

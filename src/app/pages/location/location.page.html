@@ -1,0 +1,29 @@
+<app-header></app-header>
+
+<ion-content *ngIf="location">
+    <app-locations></app-locations>
+    <h1 class="ion-text-center">{{ location.title }}</h1>
+    <div class="ion-text-center">{{ location.subtitle }}</div>
+    <ion-card *ngFor="let spot of location.spots" (click)="goSpot(spot.id, spot.soon)">
+        <ion-img
+            src="{{ spot.photos ? spot.photos[0].original_url : 'https://ionicframework.com/docs/img/demos/card-media.png' }}"></ion-img>
+        <ion-card-header>
+            <ion-card-title>
+                {{ spot.name }}
+            </ion-card-title>
+            <ion-card-subtitle>
+                {{ location.title }}
+            </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+            <div *ngIf="spot.soon == 0">
+                <ion-icon name="location-outline"></ion-icon> {{ spot.address }} {{ spot.zip }} {{ location.title }} {{
+                spot.country.name }}<br>
+                <ion-icon name="call-outline"></ion-icon> {{ spot.phone }}<br>
+                <ion-icon name="mail-outline"></ion-icon> {{ spot.email }}<br>
+                <ion-button size="small" color="primary" class="ion-margin-top">Agendar SPOT</ion-button>
+            </div>
+            <p *ngIf="spot.soon == 1">BREVEMENTE</p>
+        </ion-card-content>
+    </ion-card>
+</ion-content>

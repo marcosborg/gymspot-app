@@ -1,0 +1,24 @@
+ion-note {
+    font-size: 12px;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.row {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1;
+    padding: 8px 5px;
+}
+
+ion-item.occupied {
+    opacity: 0.2;
+    pointer-events: none;
+}

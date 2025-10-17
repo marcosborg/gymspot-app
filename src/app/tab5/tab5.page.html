@@ -1,0 +1,51 @@
+<app-header></app-header>
+
+<ion-content>
+
+    <ion-card *ngIf="!access_token">
+        <ion-card-content>
+            <p class="ion-padding-bottom">Deve fazer login para aceder às suas reservas.</p>
+            <ion-button size="small" color="primary" (click)="goLogin()">Login</ion-button>
+        </ion-card-content>
+    </ion-card>
+
+    <div class="ion-padding" *ngIf="access_token">
+        <ion-segment [value]="segment" (ionChange)="segmentChanged($event)">
+            <ion-segment-button value="all">
+                <ion-label>Packs</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="my">
+                <ion-label>Os meus packs</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </div>
+
+    <div *ngIf="segment == 'all' && packs">
+        <ion-card *ngFor="let pack of packs" (click)="goPack(pack.id)">
+            <ion-img src="{{ pack.image ? pack.image.original_url : '../../assets/placeholder.jpg' }}"></ion-img>
+            <ion-card-header>
+                <ion-card-title>Apenas {{ pack.price }}€<br><small>por {{ pack.quantity }} slots de 30
+                        minutos</small></ion-card-title>
+                <ion-card-subtitle>{{ pack.promo_title }}</ion-card-subtitle>
+            </ion-card-header>
+        </ion-card>
+    </div>
+
+    <div *ngIf="segment == 'my'">
+        <div class="ion-padding ion-text-center" *ngIf="access_token">
+            <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+                <ion-refresher-content></ion-refresher-content>
+            </ion-refresher>
+            Arraste para refrescar os packs disponíveis.
+        </div>
+        <ion-list>
+            <ion-item *ngFor="let myPack of myPacks; let last = last" [lines]="last ? 'none' : 'inset'">
+                <ion-label>
+                    Pack {{ myPack.pack.name }}<br>Disponível: {{ myPack.available }} de {{ myPack.quantity }}
+                </ion-label>
+                <ion-note>Limite: {{ myPack.limit_date }}</ion-note>
+            </ion-item>
+        </ion-list>
+    </div>
+
+</ion-content>

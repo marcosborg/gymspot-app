@@ -1,0 +1,99 @@
+<app-header></app-header>
+
+<ion-content>
+    <div *ngIf="!access_token">
+        <p class="ion-margin">Deve realizar login antes de poder utilizar o Guia Fitness.</p>
+        <ion-button expand="full" (click)="goLogin()" class="ion-margin">Fazer login</ion-button>
+    </div>
+
+    <div *ngIf="user">
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>Dados pessoais</ion-card-title>
+                <ion-card-subtitle>Olá, {{ user.name }}!</ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-card-content>
+                Esta informação é essencial para a criação de um programa de treino.
+            </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+            <ion-card-content>
+                <ion-list>
+                    <ion-item>
+                        <ion-input type="number" labelPlacement="stacked" label="Idade" [(ngModel)]="age"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" label="Género" placeholder="Selecione"
+                            [(ngModel)]="gender">
+                            <ion-select-option value="Masculino">Masculino</ion-select-option>
+                            <ion-select-option value="Feminino">Feminino</ion-select-option>
+                            <ion-select-option value="Outro">Outro</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" [(ngModel)]="fitness_level"
+                            label="Qual é o seu nível de experiência com exercícios físicos?" placeholder="Selecione">
+                            <ion-select-option value="Iniciante">Iniciante</ion-select-option>
+                            <ion-select-option value="Intermediário">Intermediário</ion-select-option>
+                            <ion-select-option value="Avançado">Avançado</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" [(ngModel)]="primary_objective" label="Objetivo Principal"
+                            placeholder="Selecione">
+                            <ion-select-option value="Perder peso">Perder peso</ion-select-option>
+                            <ion-select-option value="Ganhar massa muscular">Ganhar massa muscular</ion-select-option>
+                            <ion-select-option value="Melhorar a resistência">Melhorar a resistência</ion-select-option>
+                            <ion-select-option value="Outro">Outro</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" [(ngModel)]="primary_type" label="Tipo de treino preferido"
+                            placeholder="Selecione">
+                            <ion-select-option value="Treino básico">Treino básico</ion-select-option>
+                            <ion-select-option value="Superiores">Superiores</ion-select-option>
+                            <ion-select-option value="Full Body">Full body</ion-select-option>
+                            <ion-select-option value="Gluteo e abdominal">Gluteo e abdominal</ion-select-option>
+                            <ion-select-option value="Outro">Outro</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" [(ngModel)]="training_time" label="Duração do treino"
+                            placeholder="Selecione">
+                            <ion-select-option value="30">30 minutos</ion-select-option>
+                            <ion-select-option value="60">60 minutos</ion-select-option>
+                            <ion-select-option value="90">90 minutos</ion-select-option>
+                            <ion-select-option value="120">120 minutos</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input labelPlacement="stacked" type="number" [(ngModel)]="training_frequency"
+                            label="Vezes por semana"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select labelPlacement="stacked" [(ngModel)]="condition"
+                            label="Possui alguma condição de saúde ou lesão que deveríamos considerar?"
+                            placeholder="Selecione">
+                            <ion-select-option value="Nada a assinalar">Nada a assinalar</ion-select-option>
+                            <ion-select-option value="Problemas cardíacos">Problemas cardíacos</ion-select-option>
+                            <ion-select-option value="Problemas articulares">Problemas articulares</ion-select-option>
+                            <ion-select-option value="Diabetes">Diabetes</ion-select-option>
+                            <ion-select-option value="Hipertensão">Hipertensão</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-input labelPlacement="stacked" [(ngModel)]="condition_obs"
+                            label="Outros problemas de saúde"></ion-input>
+                    </ion-item>
+                    <ion-button expand="block" class="ion-margin" (click)="sendClientData()">Proseguir</ion-button>
+                </ion-list>
+            </ion-card-content>
+        </ion-card>
+
+    </div>
+
+    <ion-img *ngIf="toon" src="../assets/pt.png" class="virtual-pt" (click)="hideToon()"></ion-img>
+
+</ion-content>

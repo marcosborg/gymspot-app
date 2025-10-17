@@ -1,0 +1,24 @@
+<app-header></app-header>
+
+<ion-content id="main-content">
+  <div *ngIf="content_page">
+    <ion-img *ngIf="content_page.featured_image" src="{{ content_page.featured_image.original_url }}"></ion-img>
+    <ion-card class="ion-text-justify ion-margin" color="secondary">
+      <ion-card-header>
+        <ion-card-title class="ion-text-left">
+          <ion-text color="primary">
+            {{ content_page.title }}
+          </ion-text>
+          
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-text color="light">
+          <h2>{{ content_page.excerpt }}</h2>
+        </ion-text>
+        <hr style="background-color: #6d4ada;">
+        <div innerHtml="{{ content_page.page_text }}" class="ion-margin-vertical"></div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

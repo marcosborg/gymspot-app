@@ -1,0 +1,23 @@
+ion-thumbnail {
+    --border-radius: 50%;
+}
+
+ion-label.small {
+    font-size: 12px;
+}
+
+.profile-picture-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    background-size: cover;
+    background-position: center top;
+}

@@ -1,0 +1,63 @@
+<app-header></app-header>
+
+<ion-toolbar>
+  <ion-segment [(ngModel)]="tab">
+    <ion-segment-button value="guia_fitness">
+      <ion-label>Guia Fitness</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="equipment">
+      <ion-label>Exercicios disponíveis</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-toolbar>
+
+<ion-content>
+  
+
+  <ion-card *ngIf="tab == 'guia_fitness'">
+    <ion-card-content>
+      <!-- Lista de mensagens -->
+      <div class="chat-container">
+        <div *ngFor="let message of messages"
+          [ngClass]="{'outgoing': message.sender === 'me', 'incoming': message.sender !== 'me'}" class="chat-bubble" [innerHtml]="message.text">
+        </div>
+      </div>
+
+      <!-- Campo de entrada de mensagem -->
+      <div class="chat-input-container">
+        <ion-input [(ngModel)]="newMessage" placeholder="Digite sua mensagem..." class="chat-input">
+        </ion-input>
+        <ion-button (click)="sendMessage()" fill="solid" color="primary" class="send-button">
+          Enviar
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="tab == 'equipment'">
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="3" *ngFor="let item of items">
+            <div (click)="openVideo(item.video.original_url); toggleOpacity(item)"
+              [ngClass]="{'clicked': clickedItem === item}">
+              <ion-img src="{{ item.icon.thumbnail }}"></ion-img>
+              <p class="item ion-text-center">{{ item.name }}</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <div class="video-container" *ngIf="video">
+        <video width="100%" height="auto" controls>
+          <source src="{{ video_link }}" type="video/mp4">
+          Seu navegador não suporta a reprodução de vídeos.
+        </video>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+  <div *ngIf="tab == 'equipment'">
+    <ion-img *ngIf="toon" src="../assets/pt.png" class="virtual-pt" (click)="hideToon()"></ion-img>
+  </div>
+</ion-content>

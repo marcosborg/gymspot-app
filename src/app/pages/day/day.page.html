@@ -1,0 +1,49 @@
+<app-header></app-header>
+
+<ion-content *ngIf="day">
+    <ion-item lines="none">
+        <ion-thumbnail class="ion-margin">
+            <img alt="" src="{{ day.spot.photos[0].original_url }}" />
+        </ion-thumbnail>
+        <ion-label>
+            {{ day.spot.name }}<br>
+            <ion-note>{{ day.spot.location.title }} {{ day.spot.location.subtitle }}</ion-note>
+        </ion-label>
+    </ion-item>
+
+    <div class="grid">
+        <div class="row">
+            <div class="col">
+                <ion-button (click)="pastDay()" color="primary" size="small" class="ion-margin"><ion-icon
+                        name="chevron-back-outline"></ion-icon></ion-button>
+            </div>
+            <div class="col">
+                <h3 class="ion-text-center">{{ day.day }}<br><small>{{ day.dayWeek }}</small></h3>
+            </div>
+            <div class="col ion-text-right">
+                <ion-button (click)="nextDay()" color="primary" size="small" class="ion-margin"><ion-icon
+                        name="chevron-forward-outline"></ion-icon></ion-button>
+            </div>
+        </div>
+    </div>
+
+    <ion-list class="ion-margin">
+        <ion-item 
+            button 
+            *ngFor="let slot of day.slots; last as isLast" 
+            [lines]="isLast ? 'none' : ''" 
+            (click)="selectSlot(slot)"
+            [disabled]="slot.state === 'occupied'"
+            [color]="isSlotSelected(slot) ? 'light' : ''"
+            [class.occupied]="slot.state === 'occupied'"
+        >
+            <ion-label>
+                {{ slot.start }}<br>
+                <ion-note>Início às {{ slot.start }} e saida às {{ slot.end }}</ion-note>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <app-cart-button />
+
+</ion-content>
