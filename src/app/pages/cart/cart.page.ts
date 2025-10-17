@@ -3,7 +3,6 @@ import { LOCALE_ID } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import { FormsModule } from '@angular/forms';
-import { IonicSafeString } from '@ionic/core';
 import {
   IonContent,
   IonToolbar,
@@ -30,7 +29,6 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
-import { code } from 'ionicons/icons';
 
 registerLocaleData(localePt);
 
@@ -65,16 +63,16 @@ registerLocaleData(localePt);
 })
 export class CartPage {
 
-  selectedSlots: any = [];
+  selectedSlots: any[] = [];
   access_token: any;
-  totalAmount: number = 0;
-  buttons: any = [];
-  myPacks: any = [];
-  budget: number = 0;
-  promoCode: string = '';
-  validPromoCode: boolean = false;
-  helperText: string = '';
-  promoCodeDescription: string = '';
+  totalAmount = 0;
+  buttons: any[] = [];
+  myPacks: any[] = [];
+  budget = 0;
+  promoCode = '';
+  validPromoCode = false;
+  helperText = '';
+  promoCodeDescription = '';
 
   constructor(
     private preferences: PreferencesService,
@@ -83,11 +81,108 @@ export class CartPage {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private api: ApiService
-  ) { }
+  ) {}
 
   ionViewWillEnter() {
     this.inicialize();
   }
+
+  // ---------------------------
+  // Helpers mínimos (só strings YYYY-MM-DD)
+  // ---------------------------
+
+  // "2025-11-13 02:30:00" -> "2025-11-13"
+  private slotYmd(slot: any): string | null {
+    const ts = slot?.timestamp;
+    if (!ts || typeof ts !== 'string') return null;
+    const ymd = ts.split(' ')[0];
+    // sanity-check rápido
+    return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
+  }
+
+  // "2025-11-16" -> "2025-11-16"
+  private packExpiryYmd(limit_date: any): string | null {
+    if (!limit_date || typeof limit_date !== 'string') return null;
+    const ymd = limit_date.trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
+  }
+
+  private todayYmd(): string {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+
+  // packs utilizáveis: available > 0 e limit_date válido
+  private getUsablePacks(): any[] {
+    return (this.myPacks || []).filter(p => {
+      const a = Number(p?.available ?? 0);
+      const exp = this.packExpiryYmd(p?.limit_date);
+      return a > 0 && !!exp;
+    });
+  }
+
+  // orçamento visível hoje (apenas packs que não expiraram hoje)
+  private getVisibleBudget(): number {
+    const today = this.todayYmd();
+    return this.getUsablePacks().reduce((sum, p) => {
+      const exp = this.packExpiryYmd(p.limit_date)!;
+      return sum + (exp >= today ? Number(p.available) : 0);
+    }, 0);
+  }
+
+  // Validação/Alocação usando APENAS strings "YYYY-MM-DD"
+  private canCoverSlotsWithPacks(slots: any[], packs: any[]): {
+    ok: boolean;
+    reason?: 'missing_slot_dates' | 'no_valid_pack_for_some_slot';
+    detail?: { latestSlot?: string; latestValid?: string };
+  } {
+    // 1) datas dos slots
+    const slotDays: string[] = [];
+    for (const s of slots) {
+      const ymd = this.slotYmd(s);
+      if (!ymd) return { ok: false, reason: 'missing_slot_dates' };
+      slotDays.push(ymd);
+    }
+    // ordenar cronologicamente (lex em YYYY-MM-DD funciona)
+    slotDays.sort();
+
+    // 2) expandir packs em tokens (um por sessão disponível)
+    const tokens: string[] = [];
+    for (const p of packs) {
+      const exp = this.packExpiryYmd(p.limit_date)!;
+      const available = Number(p.available);
+      for (let i = 0; i < available; i++) tokens.push(exp);
+    }
+    // ordenar por validade (mais cedo primeiro)
+    tokens.sort();
+
+    if (tokens.length < slotDays.length) {
+      return { ok: false, reason: 'no_valid_pack_for_some_slot' };
+    }
+
+    // 3) alocação gulosa: para cada slot, precisa de token com expiry >= slotDay
+    for (const sDay of slotDays) {
+      const idx = tokens.findIndex(exp => exp >= sDay);
+      if (idx === -1) {
+        const latestSlot = slotDays[slotDays.length - 1];
+        const latestValid = tokens.length ? tokens[tokens.length - 1] : undefined;
+        return {
+          ok: false,
+          reason: 'no_valid_pack_for_some_slot',
+          detail: { latestSlot, latestValid }
+        };
+      }
+      tokens.splice(idx, 1); // consome
+    }
+
+    return { ok: true };
+  }
+
+  // ---------------------------
+  // Ciclo de vida
+  // ---------------------------
 
   inicialize() {
     this.loadingController.create().then((loading) => {
@@ -95,27 +190,22 @@ export class CartPage {
       this.preferences.checkName('access_token').then((resp: any) => {
         setTimeout(() => {
           this.access_token = resp.value;
-          this.preferences.checkName('selected_slots').then((resp: any) => {
+          this.preferences.checkName('selected_slots').then((resp2: any) => {
             setTimeout(() => {
-              this.selectedSlots = JSON.parse(resp.value) || [];
-              // Calcular o total
+              this.selectedSlots = JSON.parse(resp2.value) || [];
+
+              // total (respeita sale quando existir)
               this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
-                if (!slot.spot.sale) {
-                  return total + parseFloat(slot.spot.price);
-                } else {
-                  return total + parseFloat(slot.spot.sale);
-                }
+                const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
+                return total + parseFloat(price);
               }, 0);
-              let data = {
-                access_token: this.access_token
-              }
-              this.api.myPacks(data).subscribe((resp: any) => {
-                this.myPacks = resp;
-                this.budget = this.myPacks.reduce((total: number, pack: any) => total + pack.available, 0);
-                this.addButtons(this.budget).then(() => {
-                  loading.dismiss();
-                });
-              });
+
+              const data = { access_token: this.access_token };
+              this.api.myPacks(data).subscribe((resp3: any) => {
+                this.myPacks = resp3;
+                this.budget = this.getVisibleBudget();
+                this.addButtons(this.budget).then(() => loading.dismiss());
+              }, () => loading.dismiss());
             }, 500);
           });
         }, 500);
@@ -123,20 +213,21 @@ export class CartPage {
     });
   }
 
+  // ---------------------------
+  // UI / Ações
+  // ---------------------------
+
   removeFromCart(index: number) {
     this.selectedSlots.splice(index, 1);
     this.preferences.setName('selected_slots', JSON.stringify(this.selectedSlots));
-    this.updateTotal();  // Atualizar o total ao remover item
+    this.updateTotal();
   }
 
   deleteCart() {
     this.actionSheetController.create({
       header: 'Eliminar carrinho',
       buttons: [
-        {
-          text: 'cancelar',
-          role: 'cancel'
-        },
+        { text: 'cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           handler: () => {
@@ -146,86 +237,85 @@ export class CartPage {
           }
         }
       ]
-    }).then((action) => {
-      action.present();
-    });
+    }).then((action) => action.present());
   }
 
-  async addButtons(budget: any) {
+  async addButtons(_budget: number) {
     this.buttons = [
       {
         text: 'Saldo de pack',
         handler: () => {
-          if (budget > 0 && this.selectedSlots.length <= budget) {
-            let data = {
-              access_token: this.access_token,
-              cart: JSON.stringify(this.selectedSlots),
-            }
-            this.loadingController.create().then((loading) => {
-              loading.present();
-              this.api.payByBudget(data).subscribe((resp: any) => {
-                loading.dismiss();
-                this.alertController.create({
-                  header: 'Pagamento com Saldo',
-                  subHeader: 'O seu saldo será descontado',
-                  message: 'Ao prosseguir concordo com os termos e condições expressos em gymspot.pt.',
-                  backdropDismiss: false,
-                  buttons: [
-                    {
-                      text: 'Cancelar',
-                      role: 'cancel'
-                    },
-                    {
-                      text: 'Proseguir',
-                      handler: () => {
-                        this.alertController.create({
-                          header: 'Pagamento concluido',
-                          subHeader: 'O seu saldo foi descontado',
-                          message: 'Será encaminhado para a área das suas reservas para receber o código de acesso ao spot.',
-                          backdropDismiss: false,
-                          buttons: [
-                            {
-                              text: 'Prosseguir',
-                              handler: async () => {
-                                await this.preferences.removeName('selected_slots');
-                                setTimeout(() => {
-                                  this.router.navigateByUrl('/tabs/tab2');
-                                }, 500);
-                              }
-                            }
-                          ]
-                        }).then((alert) => {
-                          alert.present();
-                        });
-                      }
-                    }
-                  ]
-                }).then((alert) => {
-                  alert.present();
-                });
-              });
-            });
-          } else {
+          const packs = this.getUsablePacks();
+
+          if (packs.length === 0) {
             this.alertController.create({
               header: 'Saldo de pack',
-              subHeader: 'Saldo insuficiente!',
-              message: 'Deseja adquirir um pack para garantir mais treinos por um valor reduzido?',
+              subHeader: 'Sem saldo válido',
+              message: 'Não tem packs com saldo disponível dentro do prazo de validade. Deseja adquirir um pack?',
               buttons: [
-                {
-                  text: 'Não',
-                  role: 'cancel'
-                },
-                {
-                  text: 'Sim',
-                  handler: () => {
-                    this.router.navigateByUrl('tabs/tab5');
-                  }
-                }
+                { text: 'Agora não', role: 'cancel' },
+                { text: 'Comprar pack', handler: () => this.router.navigateByUrl('tabs/tab5') }
               ]
-            }).then((alert) => {
-              alert.present();
-            });
+            }).then(a => a.present());
+            return;
           }
+
+          const validation = this.canCoverSlotsWithPacks(this.selectedSlots, packs);
+
+          if (!validation.ok) {
+            const msg =
+              validation.reason === 'missing_slot_dates'
+                ? 'Não foi possível validar as datas das reservas (timestamp em falta).'
+                : validation.detail?.latestValid
+                  ? `Pelo menos uma reserva (${validation.detail.latestSlot}) é posterior à validade máxima dos seus packs (${validation.detail.latestValid}).`
+                  : 'Não existe saldo de pack válido para pelo menos uma das datas das suas reservas.';
+
+            this.alertController.create({
+              header: 'Saldo de pack',
+              subHeader: 'Não é possível usar saldo para estas datas',
+              message: `${msg} Deseja adquirir um pack?`,
+              buttons: [
+                { text: 'Agora não', role: 'cancel' },
+                { text: 'Comprar pack', handler: () => this.router.navigateByUrl('tabs/tab5') }
+              ]
+            }).then(a => a.present());
+            return;
+          }
+
+          // ✅ tudo ok → checkout por saldo
+          const data = {
+            access_token: this.access_token,
+            cart: JSON.stringify(this.selectedSlots),
+          };
+
+          this.loadingController.create().then((loading) => {
+            loading.present();
+            this.api.payByBudget(data).subscribe(() => {
+              loading.dismiss();
+              this.alertController.create({
+                header: 'Pagamento com Saldo',
+                subHeader: 'O seu saldo foi descontado',
+                message: 'Será encaminhado para a área das suas reservas para obter o código de acesso ao spot.',
+                backdropDismiss: false,
+                buttons: [
+                  {
+                    text: 'Prosseguir',
+                    handler: async () => {
+                      await this.preferences.removeName('selected_slots');
+                      setTimeout(() => this.router.navigateByUrl('/tabs/tab2'), 500);
+                    }
+                  }
+                ]
+              }).then(alert => alert.present());
+            }, async () => {
+              await this.alertController.create({
+                header: 'Erro no meio de pagamento',
+                message: 'Pode tentar novamente o checkout.',
+                backdropDismiss: false,
+                buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
+              }).then(a => a.present());
+            });
+          });
         }
       },
       {
@@ -236,19 +326,9 @@ export class CartPage {
             subHeader: 'Introduza o seu numero de telemóvel',
             message: 'Ao prosseguir concordo com os termos e condições expressos em gymspot.pt.',
             backdropDismiss: false,
-            inputs: [
-              {
-                name: 'celphone',
-                type: 'number',
-                placeholder: '#########',
-                label: 'Telemovel'
-              },
-            ],
+            inputs: [{ name: 'celphone', type: 'number', placeholder: '#########', label: 'Telemóvel' }],
             buttons: [
-              {
-                text: 'Cancelar',
-                role: 'cancel'
-              },
+              { text: 'Cancelar', role: 'cancel' },
               {
                 text: 'Continuar',
                 handler: async (inputs) => {
@@ -259,43 +339,31 @@ export class CartPage {
                     cart: JSON.stringify(this.selectedSlots),
                     amount: this.totalAmount,
                     celphone: inputs.celphone,
-                    promoCode: {
-                      code: this.promoCode,
-                      validPromoCode: this.validPromoCode
-                    }
+                    promoCode: { code: this.promoCode, validPromoCode: this.validPromoCode }
                   };
-                  this.api.payByMbway(data).subscribe(async (resp: any) => {
+                  this.api.payByMbway(data).subscribe(async () => {
                     await loading.dismiss();
                     const successAlert = await this.alertController.create({
                       header: 'Pagamento Mbway',
                       subHeader: 'Abra a aplicação MBWAY e autorize o pagamento.',
-                      message: 'Depois, volte à aplicação GymSpot e aceda ao separador RESERVAS para encontrar o seu código de acesso ao SPOT.',
+                      message: 'Depois, volte à app e aceda ao separador RESERVAS para encontrar o seu código.',
                       backdropDismiss: false,
-                      buttons: [
-                        {
-                          text: 'Ok',
-                          handler: async () => {
-                            await this.preferences.removeName('selected_slots');
-                            setTimeout(() => {
-                              this.router.navigateByUrl('/tabs/tab2');
-                            }, 500);
-                          }
+                      buttons: [{
+                        text: 'Ok',
+                        handler: async () => {
+                          await this.preferences.removeName('selected_slots');
+                          setTimeout(() => this.router.navigateByUrl('/tabs/tab2'), 500);
                         }
-                      ]
+                      }]
                     });
                     await successAlert.present();
-                  }, async (err) => {
+                  }, async () => {
                     await loading.dismiss();
                     const errorAlert = await this.alertController.create({
                       header: 'Erro no meio de pagamento',
                       message: 'Pode tentar novamente o checkout.',
                       backdropDismiss: false,
-                      buttons: [
-                        {
-                          text: 'Tentar novamente',
-                          role: 'cancel'
-                        }
-                      ]
+                      buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
                     });
                     await errorAlert.present();
                   });
@@ -315,10 +383,7 @@ export class CartPage {
             access_token: this.access_token,
             cart: JSON.stringify(this.selectedSlots),
             amount: this.totalAmount,
-            promoCode: {
-              code: this.promoCode,
-              validPromoCode: this.validPromoCode
-            }
+            promoCode: { code: this.promoCode, validPromoCode: this.validPromoCode }
           };
           this.api.payByMultibanco(data).subscribe(async (resp: any) => {
             await loading.dismiss();
@@ -328,33 +393,17 @@ export class CartPage {
               message: 'A referência foi enviada para o seu email. O acesso ao spot ficará disponível em RESERVAS assim que o pagamento for realizado.',
               backdropDismiss: false,
               inputs: [
-                {
-                  label: 'Entidade',
-                  value: resp.Entity,
-                  disabled: true,
-                },
-                {
-                  label: 'Referência',
-                  value: resp.Reference,
-                  disabled: true
-                },
-                {
-                  label: 'Montante',
-                  value: `${parseFloat(resp.Amount).toFixed(2)} €`,
-                  disabled: true
-                }
+                { label: 'Entidade', value: resp.Entity, disabled: true },
+                { label: 'Referência', value: resp.Reference, disabled: true },
+                { label: 'Montante', value: `${parseFloat(resp.Amount).toFixed(2)} €`, disabled: true }
               ],
-              buttons: [
-                {
-                  text: 'Concluir',
-                  handler: async () => {
-                    await this.preferences.removeName('selected_slots');
-                    setTimeout(() => {
-                      this.router.navigateByUrl('/tabs/tab2');
-                    }, 500);
-                  }
+              buttons: [{
+                text: 'Concluir',
+                handler: async () => {
+                  await this.preferences.removeName('selected_slots');
+                  setTimeout(() => this.router.navigateByUrl('/tabs/tab2'), 500);
                 }
-              ]
+              }]
             });
             await alert.present();
           }, async (err) => {
@@ -364,22 +413,13 @@ export class CartPage {
               header: 'Erro no meio de pagamento',
               message: 'Pode tentar novamente o checkout.',
               backdropDismiss: false,
-              buttons: [
-                {
-                  text: 'Tentar novamente',
-                  role: 'cancel'
-                }
-              ]
+              buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
             });
             await errorAlert.present();
           });
         }
       },
-
-      {
-        text: 'Cancelar',
-        role: 'cancel'
-      }
+      { text: 'Cancelar', role: 'cancel' }
     ];
   }
 
@@ -388,14 +428,13 @@ export class CartPage {
       header: 'Escolher método de pagamento',
       backdropDismiss: false,
       buttons: this.buttons
-    }).then((action) => {
-      action.present();
-    });
+    }).then((action) => action.present());
   }
 
   updateTotal() {
     this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
-      return total + parseFloat(slot.spot.price);
+      const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
+      return total + parseFloat(price);
     }, 0);
   }
 
@@ -406,45 +445,24 @@ export class CartPage {
   validatePromoCode() {
     this.loadingController.create().then((loading) => {
       loading.present();
-      let data = {
-        access_token: this.access_token,
-        code: this.promoCode
-      }
+      const data = { access_token: this.access_token, code: this.promoCode };
       this.api.validatePromoCode(data).subscribe((resp: any) => {
         this.helperText = resp.message;
         this.promoCodeDescription = resp.description;
-        if (resp.success == true && resp.data) {
+        if (resp.success === true && resp.data) {
           this.applyPromoCode(this.totalAmount, resp.data.type, resp.data.value, resp.data.min_value, resp.data.promo);
         }
         loading.dismiss();
-      }, (err) => {
-        loading.dismiss();
-        console.log(err);
-      });
+      }, () => loading.dismiss());
     });
   }
 
-  applyPromoCode(totalAmount: any, type: any, value: any, minValue: any, promo: any ) {
-
-    if (this.validPromoCode == false && totalAmount >= minValue && promo == 'slots') {
-
-      let discount = 0;
-
-      if (type === 'percent') {
-        discount = totalAmount * value / 100;
-      } else {
-        discount = value;
-      }
-
-      // Garante que o desconto não é maior que o total
-      if (discount > totalAmount) {
-        discount = totalAmount;
-      }
-
+  applyPromoCode(totalAmount: any, type: any, value: any, minValue: any, promo: any) {
+    if (this.validPromoCode === false && totalAmount >= minValue && promo === 'slots') {
+      let discount = type === 'percent' ? (totalAmount * value / 100) : value;
+      if (discount > totalAmount) discount = totalAmount;
       this.totalAmount = totalAmount - discount;
-
       this.validPromoCode = true;
     }
   }
-
 }
