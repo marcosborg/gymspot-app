@@ -87,7 +87,14 @@ import {
   setIonicClasses,
   setOverlayId,
   toastController
-} from "./chunk-JMRR2ZQK.js";
+} from "./chunk-RJNTNHLV.js";
+import {
+  GESTURE_CONTROLLER,
+  createGesture
+} from "./chunk-6U2AQA2C.js";
+import {
+  shouldUseCloseWatcher
+} from "./chunk-EODYS5EQ.js";
 import {
   iosTransitionAnimation
 } from "./chunk-EY4GHBHI.js";
@@ -139,13 +146,6 @@ import {
   transitionEndAsync
 } from "./chunk-4554YRK6.js";
 import {
-  GESTURE_CONTROLLER,
-  createGesture
-} from "./chunk-6U2AQA2C.js";
-import {
-  shouldUseCloseWatcher
-} from "./chunk-EODYS5EQ.js";
-import {
   doc,
   win
 } from "./chunk-QEE7QVES.js";
@@ -155,14 +155,14 @@ import {
   printIonWarning
 } from "./chunk-2H3NLAAY.js";
 import {
+  NG_VALUE_ACCESSOR
+} from "./chunk-TLSPB5FZ.js";
+import {
   ActivatedRoute,
   Router
 } from "./chunk-WEO3LXWZ.js";
 import "./chunk-7XPGCMYV.js";
 import "./chunk-VVVSVXBS.js";
-import {
-  NG_VALUE_ACCESSOR
-} from "./chunk-TLSPB5FZ.js";
 import {
   CommonModule,
   Location,
@@ -223,10 +223,10 @@ import {
   ɵɵtemplate,
   ɵɵviewQuery
 } from "./chunk-LAO3DZEQ.js";
-import "./chunk-UQGLAMHP.js";
 import {
   fromEvent
 } from "./chunk-576P5TAG.js";
+import "./chunk-UQGLAMHP.js";
 import {
   __decorate
 } from "./chunk-2K3BB2X3.js";
@@ -866,7 +866,7 @@ var RouterOutlet = proxyCustomElement(class RouterOutlet2 extends H {
           this.swipeHandler.onStart();
         }
       };
-      this.gesture = (yield import("./swipe-back-FYHOR2D6.js")).createSwipeBackGesture(this.el, () => !this.gestureOrAnimationInProgress && !!this.swipeHandler && this.swipeHandler.canStart(), () => onStart(), (step) => {
+      this.gesture = (yield import("./swipe-back-E5COORU7.js")).createSwipeBackGesture(this.el, () => !this.gestureOrAnimationInProgress && !!this.swipeHandler && this.swipeHandler.canStart(), () => onStart(), (step) => {
         var _a;
         return (_a = this.ani) === null || _a === void 0 ? void 0 : _a.progressStep(step);
       }, (shouldComplete, step, dur) => {
@@ -16616,7 +16616,7 @@ var Nav = proxyCustomElement(class Nav2 extends H {
     return __async(this, null, function* () {
       this.didLoad = true;
       this.rootChanged();
-      this.gesture = (yield import("./swipe-back-FYHOR2D6.js")).createSwipeBackGesture(this.el, this.canStart.bind(this), this.onStart.bind(this), this.onMove.bind(this), this.onEnd.bind(this));
+      this.gesture = (yield import("./swipe-back-E5COORU7.js")).createSwipeBackGesture(this.el, this.canStart.bind(this), this.onStart.bind(this), this.onMove.bind(this), this.onEnd.bind(this));
       this.swipeGestureChanged();
     });
   }
