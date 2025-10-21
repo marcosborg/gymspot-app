@@ -1,3 +1,4 @@
+// src/app/pages/cart/cart.page.ts
 import { Component } from '@angular/core';
 import { LOCALE_ID } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
@@ -29,6 +30,12 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
 import { PreferencesService } from 'src/app/services/preferences.service';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
+
+// ✅ novos imports para check de versão só no Cart
+import { Platform } from '@ionic/angular';
+import { VersionCheckService } from 'src/app/services/version-check.service';
+import { App } from '@capacitor/app';
+import { firstValueFrom } from 'rxjs';
 
 registerLocaleData(localePt);
 
@@ -80,11 +87,80 @@ export class CartPage {
     private router: Router,
     private loadingController: LoadingController,
     private alertController: AlertController,
-    private api: ApiService
+    private api: ApiService,
+    // ✅ injetados para o check de versão local (apenas no Cart)
+    private platform: Platform,
+    private versionCheck: VersionCheckService
   ) {}
 
-  ionViewWillEnter() {
-    this.inicialize();
+  // corre sempre que a página vai entrar
+  async ionViewWillEnter(): Promise<void> {
+    const loading = await this.loadingController.create();
+    await loading.present();
+
+    try {
+      // 1) Check de versão — APENAS no Cart
+      const installed = await this.versionCheck.getInstalledVersion();
+      const remote = await this.versionCheck.fetchRemote();
+
+      if (remote && this.versionCheck.mustForceUpdate(installed, remote)) {
+        await loading.dismiss();
+        await this.showForceUpdateAlert(remote.message, remote);
+        return; // bloqueia o resto do fluxo
+      }
+
+      // 2) Carregar access_token e slots (sem setTimeouts)
+      const tokenPref: any = await this.preferences.checkName('access_token');
+      this.access_token = tokenPref?.value;
+
+      const slotsPref: any = await this.preferences.checkName('selected_slots');
+      this.selectedSlots = JSON.parse(slotsPref?.value || '[]');
+
+      // 3) Total (respeita sale quando existir)
+      this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
+        const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
+        return total + parseFloat(price);
+      }, 0);
+
+      // 4) Buscar packs e preparar botões
+      const data = { access_token: this.access_token };
+      const resp3: any = await firstValueFrom(this.api.myPacks(data));
+      this.myPacks = resp3 || [];
+      this.budget = this.getVisibleBudget();
+      await this.addButtons(this.budget);
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  // ---------- Check de versão (só aqui) ----------
+  private async showForceUpdateAlert(message?: string, remote?: any) {
+    const alert = await this.alertController.create({
+      header: 'Atualização necessária',
+      message: message || 'Há uma nova versão do Gym Spot. Instala para continuar.',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Atualizar agora',
+          handler: async () => {
+            const ok = this.platform.is('android')
+              ? await this.versionCheck.tryAndroidImmediateUpdate()
+              : false;
+            if (!ok) {
+              await this.versionCheck.openStore(this.versionCheck.getStoreUrl(remote));
+            }
+          }
+        },
+        {
+          text: this.platform.is('android') ? 'Sair' : 'Fechar',
+          role: 'destructive',
+          handler: () => {
+            if (this.platform.is('android')) App.exitApp();
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   // ---------------------------
@@ -181,36 +257,13 @@ export class CartPage {
   }
 
   // ---------------------------
-  // Ciclo de vida
+  // Ciclo de vida (restante)
   // ---------------------------
 
-  inicialize() {
-    this.loadingController.create().then((loading) => {
-      loading.present();
-      this.preferences.checkName('access_token').then((resp: any) => {
-        setTimeout(() => {
-          this.access_token = resp.value;
-          this.preferences.checkName('selected_slots').then((resp2: any) => {
-            setTimeout(() => {
-              this.selectedSlots = JSON.parse(resp2.value) || [];
-
-              // total (respeita sale quando existir)
-              this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
-                const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
-                return total + parseFloat(price);
-              }, 0);
-
-              const data = { access_token: this.access_token };
-              this.api.myPacks(data).subscribe((resp3: any) => {
-                this.myPacks = resp3;
-                this.budget = this.getVisibleBudget();
-                this.addButtons(this.budget).then(() => loading.dismiss());
-              }, () => loading.dismiss());
-            }, 500);
-          });
-        }, 500);
-      });
-    });
+  // Mantive a tua assinatura porque é usada noutros pontos
+  async inicialize() {
+    // Esta função ficou “vazia” porque o trabalho foi para o ionViewWillEnter,
+    // mas mantemos para compatibilidade se for chamada noutros locais.
   }
 
   // ---------------------------
@@ -261,7 +314,7 @@ export class CartPage {
           }
 
           const validation = this.canCoverSlotsWithPacks(this.selectedSlots, packs);
-          
+
           if (!validation.ok) {
             const msg =
               validation.reason === 'missing_slot_dates'
