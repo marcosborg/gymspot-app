@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../node_modules/@capawesome/capacitor-app-update/dist/esm/web.js"],
+  "sourcesContent": ["import { WebPlugin } from '@capacitor/core';\nexport class AppUpdateWeb extends WebPlugin {\n    async getAppUpdateInfo() {\n        throw new Error('Web platform is not supported.');\n    }\n    async openAppStore() {\n        throw new Error('Web platform is not supported.');\n    }\n    async performImmediateUpdate() {\n        throw new Error('Web platform is not supported.');\n    }\n    async startFlexibleUpdate() {\n        throw new Error('Web platform is not supported.');\n    }\n    async completeFlexibleUpdate() {\n        throw new Error('Web platform is not supported.');\n    }\n}\n"],
+  "mappings": ";;;;;;;;AACO,IAAM,eAAN,cAA2B,UAAU;AAAA,EAClC,mBAAmB;AAAA;AACrB,YAAM,IAAI,MAAM,gCAAgC;AAAA,IACpD;AAAA;AAAA,EACM,eAAe;AAAA;AACjB,YAAM,IAAI,MAAM,gCAAgC;AAAA,IACpD;AAAA;AAAA,EACM,yBAAyB;AAAA;AAC3B,YAAM,IAAI,MAAM,gCAAgC;AAAA,IACpD;AAAA;AAAA,EACM,sBAAsB;AAAA;AACxB,YAAM,IAAI,MAAM,gCAAgC;AAAA,IACpD;AAAA;AAAA,EACM,yBAAyB;AAAA;AAC3B,YAAM,IAAI,MAAM,gCAAgC;AAAA,IACpD;AAAA;AACJ;",
+  "names": []
+}
