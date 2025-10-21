@@ -261,7 +261,7 @@ export class CartPage {
           }
 
           const validation = this.canCoverSlotsWithPacks(this.selectedSlots, packs);
-
+          
           if (!validation.ok) {
             const msg =
               validation.reason === 'missing_slot_dates'
@@ -308,6 +308,7 @@ export class CartPage {
                 ]
               }).then(alert => alert.present());
             }, async () => {
+              loading.dismiss();
               await this.alertController.create({
                 header: 'Erro no meio de pagamento',
                 message: 'Pode tentar novamente o checkout.',
