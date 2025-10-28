@@ -87,13 +87,20 @@ import {
   setIonicClasses,
   setOverlayId,
   toastController
-} from "./chunk-JMRR2ZQK.js";
-import {
-  iosTransitionAnimation
-} from "./chunk-EY4GHBHI.js";
+} from "./chunk-UOIPLEU6.js";
 import {
   mdTransitionAnimation
-} from "./chunk-U4T76FHW.js";
+} from "./chunk-33NLCSE2.js";
+import {
+  GESTURE_CONTROLLER,
+  createGesture
+} from "./chunk-6U2AQA2C.js";
+import {
+  shouldUseCloseWatcher
+} from "./chunk-EODYS5EQ.js";
+import {
+  iosTransitionAnimation
+} from "./chunk-PDO7TMQ4.js";
 import {
   LIFECYCLE_DID_LEAVE,
   LIFECYCLE_WILL_LEAVE,
@@ -104,7 +111,7 @@ import {
   setPageHidden,
   transition,
   waitForMount
-} from "./chunk-E2XECQYY.js";
+} from "./chunk-XNM45C4P.js";
 import {
   Build,
   Fragment,
@@ -139,13 +146,6 @@ import {
   transitionEndAsync
 } from "./chunk-4554YRK6.js";
 import {
-  GESTURE_CONTROLLER,
-  createGesture
-} from "./chunk-6U2AQA2C.js";
-import {
-  shouldUseCloseWatcher
-} from "./chunk-EODYS5EQ.js";
-import {
   doc,
   win
 } from "./chunk-QEE7QVES.js";
@@ -157,18 +157,18 @@ import {
 import {
   ActivatedRoute,
   Router
-} from "./chunk-WEO3LXWZ.js";
+} from "./chunk-RXV5IQWT.js";
+import "./chunk-OGEZXTG5.js";
+import "./chunk-IDPAZPRN.js";
 import {
   NG_VALUE_ACCESSOR
-} from "./chunk-TLSPB5FZ.js";
-import "./chunk-7XPGCMYV.js";
-import "./chunk-VVVSVXBS.js";
+} from "./chunk-WX7WP36R.js";
 import {
   CommonModule,
   Location,
   NgIf,
   NgTemplateOutlet
-} from "./chunk-CMLB3HSJ.js";
+} from "./chunk-THQAPF2E.js";
 import "./chunk-ZMLREZMJ.js";
 import {
   APP_INITIALIZER,
@@ -222,14 +222,11 @@ import {
   ɵɵrestoreView,
   ɵɵtemplate,
   ɵɵviewQuery
-} from "./chunk-LAO3DZEQ.js";
+} from "./chunk-PZEAW2HO.js";
 import {
+  __decorate,
   fromEvent
-} from "./chunk-576P5TAG.js";
-import "./chunk-UQGLAMHP.js";
-import {
-  __decorate
-} from "./chunk-2K3BB2X3.js";
+} from "./chunk-YB2C65QT.js";
 import {
   __async,
   __spreadProps,
@@ -866,7 +863,7 @@ var RouterOutlet = proxyCustomElement(class RouterOutlet2 extends H {
           this.swipeHandler.onStart();
         }
       };
-      this.gesture = (yield import("./swipe-back-FYHOR2D6.js")).createSwipeBackGesture(this.el, () => !this.gestureOrAnimationInProgress && !!this.swipeHandler && this.swipeHandler.canStart(), () => onStart(), (step) => {
+      this.gesture = (yield import("./swipe-back-E5COORU7.js")).createSwipeBackGesture(this.el, () => !this.gestureOrAnimationInProgress && !!this.swipeHandler && this.swipeHandler.canStart(), () => onStart(), (step) => {
         var _a;
         return (_a = this.ani) === null || _a === void 0 ? void 0 : _a.progressStep(step);
       }, (shouldComplete, step, dur) => {
@@ -16616,7 +16613,7 @@ var Nav = proxyCustomElement(class Nav2 extends H {
     return __async(this, null, function* () {
       this.didLoad = true;
       this.rootChanged();
-      this.gesture = (yield import("./swipe-back-FYHOR2D6.js")).createSwipeBackGesture(this.el, this.canStart.bind(this), this.onStart.bind(this), this.onMove.bind(this), this.onEnd.bind(this));
+      this.gesture = (yield import("./swipe-back-E5COORU7.js")).createSwipeBackGesture(this.el, this.canStart.bind(this), this.onStart.bind(this), this.onMove.bind(this), this.onEnd.bind(this));
       this.swipeGestureChanged();
     });
   }

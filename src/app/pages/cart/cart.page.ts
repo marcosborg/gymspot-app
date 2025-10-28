@@ -91,7 +91,7 @@ export class CartPage {
     // ✅ injetados para o check de versão local (apenas no Cart)
     private platform: Platform,
     private versionCheck: VersionCheckService
-  ) {}
+  ) { }
 
   // corre sempre que a página vai entrar
   async ionViewWillEnter(): Promise<void> {
@@ -134,7 +134,31 @@ export class CartPage {
   }
 
   // ---------- Check de versão (só aqui) ----------
+  private updateAlertOpen = false;
+
+  private async dismissAnyOverlay() {
+    // Fecha qualquer overlay que possa estar aberto (evita “fila” que bloqueia cliques)
+    try {
+      const topLoading = await this.loadingController.getTop();
+      if (topLoading) await topLoading.dismiss();
+    } catch { }
+    try {
+      const topAlert = await this.alertController.getTop();
+      if (topAlert) await topAlert.dismiss();
+    } catch { }
+    // Se usares ActionSheetController noutros fluxos, faz o mesmo:
+    try {
+      const topAction = await (this.actionSheetController as any).getTop?.();
+      if (topAction) await topAction.dismiss();
+    } catch { }
+  }
+
   private async showForceUpdateAlert(message?: string, remote?: any) {
+    if (this.updateAlertOpen) return;
+    this.updateAlertOpen = true;
+
+    await this.dismissAnyOverlay();
+
     const alert = await this.alertController.create({
       header: 'Atualização necessária',
       message: message || 'Há uma nova versão do Gym Spot. Instala para continuar.',
@@ -160,8 +184,11 @@ export class CartPage {
         }
       ]
     });
+
+    alert.onDidDismiss().then(() => (this.updateAlertOpen = false));
     await alert.present();
   }
+
 
   // ---------------------------
   // Helpers mínimos (só strings YYYY-MM-DD)
