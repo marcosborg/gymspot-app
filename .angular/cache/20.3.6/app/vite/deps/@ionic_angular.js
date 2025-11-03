@@ -1,22 +1,13 @@
 import {
   menuController
-} from "./chunk-JJTSIK76.js";
+} from "./chunk-RLGU2G7G.js";
 import {
   getTimeGivenProgression
 } from "./chunk-34QX6F67.js";
 import {
-  iosTransitionAnimation
-} from "./chunk-VJ435EV7.js";
-import {
-  mdTransitionAnimation
-} from "./chunk-EK3V2S4R.js";
-import {
-  getIonPageElement
-} from "./chunk-N3OAHKYG.js";
-import {
   IonicSafeString,
   setupConfig
-} from "./chunk-N73YS4Y3.js";
+} from "./chunk-BUTKGKAG.js";
 import {
   actionSheetController,
   alertController,
@@ -25,29 +16,38 @@ import {
   pickerController,
   popoverController,
   toastController
-} from "./chunk-EIRXCCYF.js";
-import "./chunk-XGTXIMMS.js";
+} from "./chunk-2TGICC65.js";
+import "./chunk-MLSVQUXY.js";
 import {
   openURL
 } from "./chunk-YHTFT7Q3.js";
 import {
-  createAnimation
-} from "./chunk-TUKEFYEZ.js";
-import {
   getPlatforms,
   initialize,
   isPlatform
-} from "./chunk-WJCJPSHS.js";
-import "./chunk-4N2A3XSG.js";
+} from "./chunk-5H4KGK5S.js";
 import {
   createGesture
 } from "./chunk-Z3OEOVFM.js";
 import "./chunk-QA2SYHF5.js";
-import "./chunk-QQYE4K2J.js";
+import "./chunk-TTUIR3YY.js";
+import {
+  iosTransitionAnimation
+} from "./chunk-DKIWSXUX.js";
+import {
+  mdTransitionAnimation
+} from "./chunk-TFQ4GQVB.js";
+import {
+  getIonPageElement
+} from "./chunk-TTXKZECZ.js";
+import {
+  createAnimation
+} from "./chunk-JRQH5LWS.js";
+import "./chunk-ATY6BZTB.js";
 import "./chunk-LCMILTBF.js";
 import {
   bootstrapLazy
-} from "./chunk-4JA72HX2.js";
+} from "./chunk-AHSSUCCA.js";
 import {
   AngularDelegate,
   Config,
@@ -72,20 +72,20 @@ import {
   provideComponentInputBinding,
   raf,
   setIonicClasses
-} from "./chunk-UOIPLEU6.js";
-import "./chunk-33NLCSE2.js";
-import "./chunk-6U2AQA2C.js";
+} from "./chunk-6NX7A6PY.js";
+import "./chunk-CGYZ6MXS.js";
 import "./chunk-EODYS5EQ.js";
-import "./chunk-PDO7TMQ4.js";
-import "./chunk-XNM45C4P.js";
-import "./chunk-PMTKRSGE.js";
-import "./chunk-4554YRK6.js";
-import "./chunk-QEE7QVES.js";
-import "./chunk-2H3NLAAY.js";
+import "./chunk-6U2AQA2C.js";
 import {
   ActivatedRoute,
   Router
 } from "./chunk-RXV5IQWT.js";
+import "./chunk-VGWGOOWX.js";
+import "./chunk-FXFAC77E.js";
+import "./chunk-PMTKRSGE.js";
+import "./chunk-QEE7QVES.js";
+import "./chunk-4554YRK6.js";
+import "./chunk-2H3NLAAY.js";
 import "./chunk-OGEZXTG5.js";
 import "./chunk-IDPAZPRN.js";
 import {
