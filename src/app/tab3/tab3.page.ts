@@ -153,20 +153,35 @@ export class Tab3Page implements OnInit {
           }).then((alert) => {
             alert.present();
           });
+        }).catch(() => {
+          loading.dismiss();
+          this.alertController.create({
+            header: 'Erro no login',
+            message: 'Nao foi possivel guardar a sessao. Tente novamente.',
+            buttons: ['Ok']
+          }).then((alert) => {
+            alert.present();
+          });
         });
       }, (err: any) => {
         loading.dismiss();
-        let errors = err.error.errors;
         let errorMessages = '';
-        for (const field in errors) {
-          if (errors.hasOwnProperty(field)) {
-            errors[field].forEach((message: string) => {
-              errorMessages += `${message}. `;
-            });
+        const apiErrors = err?.error?.errors;
+        if (apiErrors) {
+          for (const field in apiErrors) {
+            if (apiErrors.hasOwnProperty(field)) {
+              apiErrors[field].forEach((message: string) => {
+                errorMessages += `${message}. `;
+              });
+            }
           }
+        } else if (err?.name === 'TimeoutError') {
+          errorMessages = 'A ligacao demorou demasiado tempo. Tente novamente.';
+        } else {
+          errorMessages = 'Nao foi possivel ligar ao servidor. Verifique a ligacao e tente novamente.';
         }
         this.alertController.create({
-          header: 'Erro de validação',
+          header: 'Erro no login',
           message: errorMessages,
           buttons: [
             {
@@ -174,7 +189,7 @@ export class Tab3Page implements OnInit {
               role: 'cancel'
             },
             {
-              text: 'Pedir recuperação de password',
+              text: 'Pedir recuperacao de password',
               handler: () => {
                 window.location.href = "https://gymspot.pt/password/reset";
               }
@@ -373,3 +388,6 @@ export class Tab3Page implements OnInit {
   }
 
 }
+
+
+

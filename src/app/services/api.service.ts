@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { timeout } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -117,7 +118,7 @@ export class ApiService {
   }
 
   login(data: any) {
-    return this.http.post(this.auth_url + 'login', data, this.httpOptions);
+    return this.http.post(this.auth_url + 'login', data, this.httpOptions).pipe(timeout(15000));
   }
 
   user(data: any) {
