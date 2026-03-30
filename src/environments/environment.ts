@@ -4,6 +4,11 @@
 
 export const environment = {
   production: false,
+  api: {
+    publicUrl: 'http://127.0.0.1:8000/api/v2/',
+    protectedUrl: 'http://127.0.0.1:8000/api/v1/',
+    authUrl: 'http://127.0.0.1:8000/api/',
+  },
   updateConfig: {
     versionUrl: 'https://gymspot.pt/app-version.json',
     iosUrl: 'https://apps.apple.com/pt/app/gymspot/id6479336982',

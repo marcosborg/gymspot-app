@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { timeout } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,18 +11,10 @@ export class ApiService {
   constructor(
     private http: HttpClient
   ) {
-    if (this.sandbox) {
-      this.url = 'http://127.0.0.1:8000/api/v2/';
-      this.protected_url = 'http://127.0.0.1:8000/api/v1/';
-      this.auth_url = 'http://127.0.0.1:8000/api/';
-    } else {
-      this.url = 'https://gymspot.pt/api/v2/';
-      this.protected_url = 'https://gymspot.pt/api/v1/';
-      this.auth_url = 'https://gymspot.pt/api/';
-    }
+    this.url = environment.api.publicUrl;
+    this.protected_url = environment.api.protectedUrl;
+    this.auth_url = environment.api.authUrl;
   }
-
-  sandbox: boolean = true;
 
   url: any;
   protected_url: any;
