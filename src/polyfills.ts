@@ -44,6 +44,16 @@
 
 import './zone-flags';
 
+if (typeof window !== 'undefined' && window.performance) {
+  const perf = window.performance as unknown as { clearMarks?: Function; clearMeasures?: Function };
+  if (typeof perf.clearMarks !== 'function') {
+    perf.clearMarks = () => {};
+  }
+  if (typeof perf.clearMeasures !== 'function') {
+    perf.clearMeasures = () => {};
+  }
+}
+
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
