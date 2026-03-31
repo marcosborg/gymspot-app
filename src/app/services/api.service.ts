@@ -244,6 +244,16 @@ export class ApiService {
     return this.http.post(this.auth_url + 'payments/pay-by-budget', data, this.httpOptions);
   }
 
+  validateCartSlots(data: any) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Accept-Language': 'pt',
+        'Authorization': 'Bearer ' + data.access_token
+      })
+    };
+    return this.http.post(this.auth_url + 'payments/validate-cart-slots', data, this.httpOptions);
+  }
+
   createClientData(data: any) {
     this.httpOptions = {
       headers: new HttpHeaders({

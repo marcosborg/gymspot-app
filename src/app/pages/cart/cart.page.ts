@@ -31,7 +31,6 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 
-// ✅ novos imports para check de versão só no Cart
 import { Platform } from '@ionic/angular';
 import { VersionCheckService } from 'src/app/services/version-check.service';
 import { App } from '@capacitor/app';
@@ -80,6 +79,7 @@ export class CartPage {
   validPromoCode = false;
   helperText = '';
   promoCodeDescription = '';
+  validatingAvailability = false;
 
   constructor(
     private preferences: PreferencesService,
@@ -88,41 +88,33 @@ export class CartPage {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private api: ApiService,
-    // ✅ injetados para o check de versão local (apenas no Cart)
     private platform: Platform,
     private versionCheck: VersionCheckService
   ) { }
 
-  // corre sempre que a página vai entrar
   async ionViewWillEnter(): Promise<void> {
     const loading = await this.loadingController.create();
     await loading.present();
 
     try {
-      // 1) Check de versão — APENAS no Cart
       const installed = await this.versionCheck.getInstalledVersion();
       const remote = await this.versionCheck.fetchRemote();
 
       if (remote && this.versionCheck.mustForceUpdate(installed, remote)) {
         await loading.dismiss();
         await this.showForceUpdateAlert(remote.message, remote);
-        return; // bloqueia o resto do fluxo
+        return;
       }
 
-      // 2) Carregar access_token e slots (sem setTimeouts)
       const tokenPref: any = await this.preferences.checkName('access_token');
       this.access_token = tokenPref?.value;
 
       const slotsPref: any = await this.preferences.checkName('selected_slots');
       this.selectedSlots = JSON.parse(slotsPref?.value || '[]');
+      await this.purgeExpiredSlotsFromCart(true);
 
-      // 3) Total (respeita sale quando existir)
-      this.totalAmount = this.selectedSlots.reduce((total: number, slot: any) => {
-        const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
-        return total + parseFloat(price);
-      }, 0);
+      this.updateTotal();
 
-      // 4) Buscar packs e preparar botões
       const data = { access_token: this.access_token };
       const resp3: any = await firstValueFrom(this.api.myPacks(data));
       this.myPacks = resp3 || [];
@@ -133,11 +125,9 @@ export class CartPage {
     }
   }
 
-  // ---------- Check de versão (só aqui) ----------
   private updateAlertOpen = false;
 
   private async dismissAnyOverlay() {
-    // Fecha qualquer overlay que possa estar aberto (evita “fila” que bloqueia cliques)
     try {
       const topLoading = await this.loadingController.getTop();
       if (topLoading) await topLoading.dismiss();
@@ -146,7 +136,6 @@ export class CartPage {
       const topAlert = await this.alertController.getTop();
       if (topAlert) await topAlert.dismiss();
     } catch { }
-    // Se usares ActionSheetController noutros fluxos, faz o mesmo:
     try {
       const topAction = await (this.actionSheetController as any).getTop?.();
       if (topAction) await topAction.dismiss();
@@ -189,21 +178,13 @@ export class CartPage {
     await alert.present();
   }
 
-
-  // ---------------------------
-  // Helpers mínimos (só strings YYYY-MM-DD)
-  // ---------------------------
-
-  // "2025-11-13 02:30:00" -> "2025-11-13"
   private slotYmd(slot: any): string | null {
     const ts = slot?.timestamp;
     if (!ts || typeof ts !== 'string') return null;
     const ymd = ts.split(' ')[0];
-    // sanity-check rápido
     return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd : null;
   }
 
-  // "2025-11-16" -> "2025-11-16"
   private packExpiryYmd(limit_date: any): string | null {
     if (!limit_date || typeof limit_date !== 'string') return null;
     const ymd = limit_date.trim();
@@ -217,7 +198,6 @@ export class CartPage {
     return `${d.getFullYear()}-${mm}-${dd}`;
   }
 
-  // packs utilizáveis: available > 0 e limit_date válido
   private getUsablePacks(): any[] {
     return (this.myPacks || []).filter(p => {
       const a = Number(p?.available ?? 0);
@@ -226,7 +206,6 @@ export class CartPage {
     });
   }
 
-  // orçamento visível hoje (apenas packs que não expiraram hoje)
   private getVisibleBudget(): number {
     const today = this.todayYmd();
     return this.getUsablePacks().reduce((sum, p) => {
@@ -235,37 +214,31 @@ export class CartPage {
     }, 0);
   }
 
-  // Validação/Alocação usando APENAS strings "YYYY-MM-DD"
   private canCoverSlotsWithPacks(slots: any[], packs: any[]): {
     ok: boolean;
     reason?: 'missing_slot_dates' | 'no_valid_pack_for_some_slot';
     detail?: { latestSlot?: string; latestValid?: string };
   } {
-    // 1) datas dos slots
     const slotDays: string[] = [];
     for (const s of slots) {
       const ymd = this.slotYmd(s);
       if (!ymd) return { ok: false, reason: 'missing_slot_dates' };
       slotDays.push(ymd);
     }
-    // ordenar cronologicamente (lex em YYYY-MM-DD funciona)
     slotDays.sort();
 
-    // 2) expandir packs em tokens (um por sessão disponível)
     const tokens: string[] = [];
     for (const p of packs) {
       const exp = this.packExpiryYmd(p.limit_date)!;
       const available = Number(p.available);
       for (let i = 0; i < available; i++) tokens.push(exp);
     }
-    // ordenar por validade (mais cedo primeiro)
     tokens.sort();
 
     if (tokens.length < slotDays.length) {
       return { ok: false, reason: 'no_valid_pack_for_some_slot' };
     }
 
-    // 3) alocação gulosa: para cada slot, precisa de token com expiry >= slotDay
     for (const sDay of slotDays) {
       const idx = tokens.findIndex(exp => exp >= sDay);
       if (idx === -1) {
@@ -277,25 +250,14 @@ export class CartPage {
           detail: { latestSlot, latestValid }
         };
       }
-      tokens.splice(idx, 1); // consome
+      tokens.splice(idx, 1);
     }
 
     return { ok: true };
   }
 
-  // ---------------------------
-  // Ciclo de vida (restante)
-  // ---------------------------
-
-  // Mantive a tua assinatura porque é usada noutros pontos
   async inicialize() {
-    // Esta função ficou “vazia” porque o trabalho foi para o ionViewWillEnter,
-    // mas mantemos para compatibilidade se for chamada noutros locais.
   }
-
-  // ---------------------------
-  // UI / Ações
-  // ---------------------------
 
   removeFromCart(index: number) {
     this.selectedSlots.splice(index, 1);
@@ -362,7 +324,6 @@ export class CartPage {
             return;
           }
 
-          // ✅ tudo ok → checkout por saldo
           const data = {
             access_token: this.access_token,
             cart: JSON.stringify(this.selectedSlots),
@@ -387,14 +348,9 @@ export class CartPage {
                   }
                 ]
               }).then(alert => alert.present());
-            }, async () => {
+            }, async (err) => {
               loading.dismiss();
-              await this.alertController.create({
-                header: 'Erro no meio de pagamento',
-                message: 'Pode tentar novamente o checkout.',
-                backdropDismiss: false,
-                buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
-              }).then(a => a.present());
+              await this.handleCheckoutError(err);
             });
           });
         }
@@ -438,15 +394,9 @@ export class CartPage {
                       }]
                     });
                     await successAlert.present();
-                  }, async () => {
+                  }, async (err) => {
                     await loading.dismiss();
-                    const errorAlert = await this.alertController.create({
-                      header: 'Erro no meio de pagamento',
-                      message: 'Pode tentar novamente o checkout.',
-                      backdropDismiss: false,
-                      buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
-                    });
-                    await errorAlert.present();
+                    await this.handleCheckoutError(err);
                   });
                 }
               },
@@ -489,14 +439,7 @@ export class CartPage {
             await alert.present();
           }, async (err) => {
             await loading.dismiss();
-            console.log(err);
-            const errorAlert = await this.alertController.create({
-              header: 'Erro no meio de pagamento',
-              message: 'Pode tentar novamente o checkout.',
-              backdropDismiss: false,
-              buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
-            });
-            await errorAlert.present();
+            await this.handleCheckoutError(err);
           });
         }
       },
@@ -504,7 +447,12 @@ export class CartPage {
     ];
   }
 
-  pay() {
+  async pay() {
+    const stillAvailable = await this.ensureCartSlotsStillAvailable();
+    if (!stillAvailable) {
+      return;
+    }
+
     this.actionSheetController.create({
       header: 'Escolher método de pagamento',
       backdropDismiss: false,
@@ -517,6 +465,216 @@ export class CartPage {
       const price = slot?.spot?.sale ?? slot?.spot?.price ?? 0;
       return total + parseFloat(price);
     }, 0);
+  }
+
+  private isSameSelectedSlot(slotA: any, slotB: any): boolean {
+    return slotA?.timestamp === slotB?.timestamp
+      && slotA?.start === slotB?.start
+      && slotA?.end === slotB?.end
+      && slotA?.spot?.id === slotB?.spot_id;
+  }
+
+  private parseLocalDateTime(value: string): Date | null {
+    if (!value || typeof value !== 'string') {
+      return null;
+    }
+
+    const [datePart, timePart] = value.trim().split(' ');
+    if (!datePart || !timePart) {
+      return null;
+    }
+
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hours, minutes, seconds = 0] = timePart.split(':').map(Number);
+
+    if ([year, month, day, hours, minutes, seconds].some(Number.isNaN)) {
+      return null;
+    }
+
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  }
+
+  private buildSlotEndDate(slot: any): Date | null {
+    const startDate = this.parseLocalDateTime(slot?.timestamp);
+    if (!startDate) {
+      return null;
+    }
+
+    const end = slot?.end;
+    if (!end || typeof end !== 'string') {
+      const fallbackEnd = new Date(startDate.getTime());
+      fallbackEnd.setMinutes(fallbackEnd.getMinutes() + 30);
+      return fallbackEnd;
+    }
+
+    const [hours, minutes] = end.split(':').map(Number);
+    if ([hours, minutes].some(Number.isNaN)) {
+      return null;
+    }
+
+    return new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      hours,
+      minutes,
+      0,
+      0
+    );
+  }
+
+  private isSlotExpired(slot: any): boolean {
+    const slotEnd = this.buildSlotEndDate(slot);
+    if (!slotEnd) {
+      return false;
+    }
+
+    return slotEnd.getTime() <= Date.now();
+  }
+
+  private async removeConflictingSlots(conflicts: any[]): Promise<void> {
+    this.selectedSlots = this.selectedSlots.filter((selectedSlot) => !conflicts.some((conflict) =>
+      this.isSameSelectedSlot(selectedSlot, conflict)
+    ));
+
+    await this.preferences.setName('selected_slots', JSON.stringify(this.selectedSlots));
+    this.updateTotal();
+    this.budget = this.getVisibleBudget();
+    await this.addButtons(this.budget);
+  }
+
+  private async purgeExpiredSlotsFromCart(showAlert = false): Promise<boolean> {
+    const expiredSlots = this.selectedSlots.filter((slot) => this.isSlotExpired(slot));
+    if (expiredSlots.length === 0) {
+      return false;
+    }
+
+    this.selectedSlots = this.selectedSlots.filter((slot) => !this.isSlotExpired(slot));
+    await this.preferences.setName('selected_slots', JSON.stringify(this.selectedSlots));
+    this.updateTotal();
+    this.budget = this.getVisibleBudget();
+    await this.addButtons(this.budget);
+
+    if (showAlert) {
+      await this.alertController.create({
+        header: 'Slots expiradas',
+        message: `Foram removidas do carrinho reservas cujo horário já terminou:<br><br>${this.formatConflictMessage(expiredSlots.map((slot) => ({
+          spot_id: slot?.spot?.id,
+          spot_name: slot?.spot?.name ?? null,
+          timestamp: slot?.timestamp,
+          start: slot?.start,
+          end: slot?.end,
+          reason: 'expired',
+        })))}`,
+        backdropDismiss: false,
+        buttons: ['Ok']
+      }).then((alert) => alert.present());
+    }
+
+    return true;
+  }
+
+  private formatConflictMessage(conflicts: any[]): string {
+    return conflicts
+      .map((conflict) => {
+        const reason = conflict?.reason === 'expired'
+          ? 'horário terminado'
+          : 'ocupada';
+        return `${conflict.spot_name ?? 'Spot'}: ${conflict.timestamp} (${conflict.start} - ${conflict.end}) - ${reason}`;
+      })
+      .join('<br>');
+  }
+
+  private async ensureCartSlotsStillAvailable(): Promise<boolean> {
+    if (this.validatingAvailability) {
+      return false;
+    }
+
+    const removedExpiredSlots = await this.purgeExpiredSlotsFromCart(true);
+    if (removedExpiredSlots && this.selectedSlots.length === 0) {
+      return false;
+    }
+
+    if (!this.access_token || this.selectedSlots.length === 0) {
+      return this.selectedSlots.length > 0;
+    }
+
+    this.validatingAvailability = true;
+    const loading = await this.loadingController.create();
+    await loading.present();
+
+    try {
+      await firstValueFrom(this.api.validateCartSlots({
+        access_token: this.access_token,
+        cart: JSON.stringify(this.selectedSlots),
+      }));
+      return true;
+    } catch (err: any) {
+      if (err?.status === 409) {
+        const conflicts = err?.error?.conflicts ?? [];
+        await this.removeConflictingSlots(conflicts);
+        await this.alertController.create({
+          header: 'Slots indisponíveis',
+          message: conflicts.length > 0
+            ? `Algumas reservas do carrinho já não estão disponíveis ou já passaram da hora e foram removidas:<br><br>${this.formatConflictMessage(conflicts)}`
+            : 'Algumas reservas do carrinho já não estão disponíveis.',
+          backdropDismiss: false,
+          buttons: ['Ok']
+        }).then((alert) => alert.present());
+      } else if (err?.status === 422) {
+        await this.alertController.create({
+          header: 'Limite de reservas',
+          message: err?.error?.message ?? 'O carrinho não cumpre as regras de reserva.',
+          backdropDismiss: false,
+          buttons: ['Ok']
+        }).then((alert) => alert.present());
+      } else {
+        await this.alertController.create({
+          header: 'Erro ao validar carrinho',
+          message: 'Não foi possível confirmar a disponibilidade atual das reservas. Tente novamente.',
+          backdropDismiss: false,
+          buttons: ['Ok']
+        }).then((alert) => alert.present());
+      }
+
+      return false;
+    } finally {
+      this.validatingAvailability = false;
+      await loading.dismiss();
+    }
+  }
+
+  private async handleCheckoutError(err: any): Promise<void> {
+    if (err?.status === 409) {
+      const conflicts = err?.error?.conflicts ?? [];
+      await this.removeConflictingSlots(conflicts);
+      await this.alertController.create({
+        header: 'Slots indisponíveis',
+        message: conflicts.length > 0
+          ? `Algumas reservas do carrinho já não estão disponíveis ou já passaram da hora e foram removidas:<br><br>${this.formatConflictMessage(conflicts)}`
+          : 'Algumas reservas do carrinho já não estão disponíveis.',
+        backdropDismiss: false,
+        buttons: ['Ok']
+      }).then((alert) => alert.present());
+      return;
+    }
+
+    if (err?.status === 422) {
+      await this.alertController.create({
+        header: 'Limite de reservas',
+        message: err?.error?.message ?? 'O carrinho não cumpre as regras de reserva.',
+        backdropDismiss: false,
+        buttons: ['Ok']
+      }).then((alert) => alert.present());
+      return;
+    }
+
+    await this.alertController.create({
+      header: 'Erro no meio de pagamento',
+      message: 'Pode tentar novamente o checkout.',
+      backdropDismiss: false,
+      buttons: [{ text: 'Tentar novamente', role: 'cancel' }]
+    }).then((alert) => alert.present());
   }
 
   goLogin() {
