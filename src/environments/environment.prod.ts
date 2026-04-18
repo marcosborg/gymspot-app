@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
   api: {
-    publicUrl: 'https://gymspot.pt/api/v2/',
-    protectedUrl: 'https://gymspot.pt/api/v1/',
-    authUrl: 'https://gymspot.pt/api/',
+    localBaseUrl: 'http://127.0.0.1:8000/api',
+    localNativeBaseUrl: 'http://192.168.1.64:8000/api',
+    remoteBaseUrl: 'https://gymspot.pt/api',
   },
   updateConfig: {
     versionUrl: 'https://gymspot.pt/app-version.json',

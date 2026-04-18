@@ -9,21 +9,31 @@
             <ion-card-content>
                 <ion-list class="ion-margin-top">
                     <ion-item>
-                        <ion-input [(ngModel)]="user.name" label="Nome" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="user.name" (ionInput)="updateUserField('name', $event)" label="Nome" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="user.email" (ionInput)="updateUserField('email', $event)" label="Email" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="user.password" type="password" label="Password"
+                        <ion-input [value]="user.password" (ionInput)="updateUserField('password', $event)"
+                            [type]="showRegisterPassword ? 'text' : 'password'" label="Password"
                             labelPlacement="stacked"></ion-input>
+                        <ion-button fill="clear" slot="end" color="medium" (click)="toggleRegisterPassword()"
+                            [attr.aria-label]="showRegisterPassword ? 'Ocultar password' : 'Mostrar password'">
+                            <ion-icon [name]="showRegisterPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
                     </ion-item>
                     <ion-item lines="none">
-                        <ion-input [(ngModel)]="user.password_confirmation" type="password"
+                        <ion-input [value]="user.password_confirmation" (ionInput)="updateUserField('password_confirmation', $event)"
+                            [type]="showRegisterPasswordConfirmation ? 'text' : 'password'"
                             label="Repetição da password" labelPlacement="stacked"></ion-input>
+                        <ion-button fill="clear" slot="end" color="medium" (click)="toggleRegisterPasswordConfirmation()"
+                            [attr.aria-label]="showRegisterPasswordConfirmation ? 'Ocultar confirmação da password' : 'Mostrar confirmação da password'">
+                            <ion-icon [name]="showRegisterPasswordConfirmation ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
                     </ion-item>
                 </ion-list>
-                <ion-button *ngIf="!access_token" expand="block" class="ion-margin-top" (click)="register()">Criar
+                <ion-button *ngIf="!access_token" [disabled]="isSubmitting" expand="block" class="ion-margin-top" (click)="register()">Criar
                     conta</ion-button>
                 <ion-button class="ion-margin" size="small" fill="clear" expand="full" (click)="create = !create">Já
                     possuo conta</ion-button>
@@ -36,14 +46,19 @@
             <ion-card-content>
                 <ion-list class="ion-margin-top">
                     <ion-item>
-                        <ion-input [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="user.email" (ionInput)="updateUserField('email', $event)" label="Email" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item lines="none">
-                        <ion-input [(ngModel)]="user.password" type="Password" label="Password"
+                        <ion-input [value]="user.password" (ionInput)="updateUserField('password', $event)"
+                            [type]="showLoginPassword ? 'text' : 'password'" label="Password"
                             labelPlacement="stacked"></ion-input>
+                        <ion-button fill="clear" slot="end" color="medium" (click)="toggleLoginPassword()"
+                            [attr.aria-label]="showLoginPassword ? 'Ocultar password' : 'Mostrar password'">
+                            <ion-icon [name]="showLoginPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
                     </ion-item>
                 </ion-list>
-                <ion-button expand="block" class="ion-margin-top" (click)="login()">Login</ion-button>
+                <ion-button [disabled]="isSubmitting" expand="block" class="ion-margin-top" (click)="login()">Login</ion-button>
                 <ion-button class="ion-margin" size="small" fill="clear" expand="full" (click)="create = !create">Criar
                     conta</ion-button>
             </ion-card-content>
@@ -57,21 +72,21 @@
             <ion-card-content>
                 <ion-list class="ion-margin-top">
                     <ion-item>
-                        <ion-input [(ngModel)]="user.name" label="Nome" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="user.name" (ionInput)="updateUserField('name', $event)" label="Nome" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input disabled [(ngModel)]="user.email" label="Email" labelPlacement="stacked"></ion-input>
+                        <ion-input disabled [value]="user.email" label="Email" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="password" type="password" label="Password"
+                        <ion-input [value]="password" (ionInput)="updatePasswordField('password', $event)" type="password" label="Password"
                             labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item lines="none">
-                        <ion-input [(ngModel)]="password_confirmation" type="password" label="Repetição da password"
-                            labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="password_confirmation" (ionInput)="updatePasswordField('password_confirmation', $event)"
+                            type="password" label="Repetição da password" labelPlacement="stacked"></ion-input>
                     </ion-item>
                 </ion-list>
-                <ion-button expand="block" class="ion-margin-top" (click)="updateUser()">Atualizar
+                <ion-button [disabled]="isSubmitting" expand="block" class="ion-margin-top" (click)="updateUser()">Atualizar
                     conta</ion-button>
                 <ion-button class="ion-margin" size="small" fill="clear" expand="full"
                     (click)="logout()">Logout</ion-button>
@@ -87,14 +102,14 @@
             <ion-card-content>
                 <ion-list class="ion-margin-top">
                     <ion-item>
-                        <ion-input [(ngModel)]="client.name" label="Nome de faturação"
+                        <ion-input [value]="client.name" (ionInput)="updateClientField('name', $event)" label="Nome de faturação"
                             labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="client.zip" label="Código postal" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="client.zip" (ionInput)="updateClientField('zip', $event)" label="Código postal" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="client.location" label="Localidade"
+                        <ion-input [value]="client.location" (ionInput)="updateClientField('location', $event)" label="Localidade"
                             labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item>
@@ -105,13 +120,13 @@
                         </ion-select>
                     </ion-item>
                     <ion-item>
-                        <ion-input [(ngModel)]="client.phone" label="Telefone" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="client.phone" (ionInput)="updateClientField('phone', $event)" label="Telefone" labelPlacement="stacked"></ion-input>
                     </ion-item>
                     <ion-item lines="none">
-                        <ion-input [(ngModel)]="client.vat" label="Contribuinte" labelPlacement="stacked"></ion-input>
+                        <ion-input [value]="client.vat" (ionInput)="updateClientField('vat', $event)" label="Contribuinte" labelPlacement="stacked"></ion-input>
                     </ion-item>
                 </ion-list>
-                <ion-button expand="block" class="ion-margin-top" (click)="updateClient()">Atualizar
+                <ion-button [disabled]="isSubmitting" expand="block" class="ion-margin-top" (click)="updateClient()">Atualizar
                     conta</ion-button>
             </ion-card-content>
         </ion-card>
