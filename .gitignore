@@ -1,4 +1,5 @@
 /www
+.angular/
 .vscode
 ios
 android
