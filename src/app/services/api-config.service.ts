@@ -28,14 +28,15 @@ export class ApiConfigService {
 
   private resolveBaseUrl(): string {
     const platform = Capacitor.getPlatform();
+    const isNativePlatform = Capacitor.isNativePlatform();
     const isWeb = platform === 'web';
     const isAndroid = platform === 'android';
     const isLocalHost = typeof window !== 'undefined'
       && ['localhost', '127.0.0.1'].includes(window.location.hostname);
     const nativeLocalBaseUrl = environment.api.localNativeBaseUrl || environment.api.localBaseUrl;
 
-    // Web dev always targets the local Laravel instance.
-    if (isWeb || isLocalHost) {
+    // Browser/web dev always targets the local Laravel instance.
+    if (isWeb || (!isNativePlatform && isLocalHost)) {
       return environment.api.localBaseUrl;
     }
 
