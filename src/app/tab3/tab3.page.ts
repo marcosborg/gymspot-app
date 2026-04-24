@@ -175,6 +175,11 @@ export class Tab3Page implements OnInit {
   }
 
   private buildValidationMessage(err: any, fallback: string): string {
+    const duplicateEmailMessage = this.buildDuplicateEmailMessage(err);
+    if (duplicateEmailMessage) {
+      return duplicateEmailMessage;
+    }
+
     const apiErrors = err?.error?.errors;
     if (!apiErrors) {
       return fallback;
@@ -190,6 +195,24 @@ export class Tab3Page implements OnInit {
     }
 
     return message || fallback;
+  }
+
+  private buildDuplicateEmailMessage(err: any): string | null {
+    const errorMessage = String(err?.error?.message ?? '').toLowerCase();
+    const emailErrors = Array.isArray(err?.error?.errors?.email) ? err.error.errors.email : [];
+    const combinedEmailErrors = emailErrors.join(' ').toLowerCase();
+
+    const looksLikeDuplicateEmail = errorMessage.includes('users_email_unique')
+      || errorMessage.includes('duplicate entry')
+      || combinedEmailErrors.includes('already been taken')
+      || combinedEmailErrors.includes('já foi utilizado')
+      || combinedEmailErrors.includes('ja foi utilizado');
+
+    if (!looksLikeDuplicateEmail) {
+      return null;
+    }
+
+    return 'Já existe uma conta com este email. Faça login ou recupere a password.';
   }
 
   async login() {
@@ -259,12 +282,12 @@ export class Tab3Page implements OnInit {
       await firstValueFrom(this.api.register(this.user));
 
       const alert = await this.alertController.create({
-        header: 'Verificacao de conta',
-        message: 'Consulte o seu email para concluir a verificacao do seu registo',
+        header: 'Conta criada com sucesso',
+        message: 'A sua conta já está ativa. Pode fazer login de imediato.',
         backdropDismiss: false,
         buttons: [
           {
-            text: 'Ja verifiquei',
+            text: 'Continuar',
             handler: () => {
               this.create = false;
             }

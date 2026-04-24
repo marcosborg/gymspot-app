@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
 
 import { environment } from '../../environments/environment';
 
@@ -27,25 +26,6 @@ export class ApiConfigService {
   }
 
   private resolveBaseUrl(): string {
-    const platform = Capacitor.getPlatform();
-    const isNativePlatform = Capacitor.isNativePlatform();
-    const isWeb = platform === 'web';
-    const isAndroid = platform === 'android';
-    const isLocalHost = typeof window !== 'undefined'
-      && ['localhost', '127.0.0.1'].includes(window.location.hostname);
-    const nativeLocalBaseUrl = environment.api.localNativeBaseUrl || environment.api.localBaseUrl;
-
-    // Browser/web dev always targets the local Laravel instance.
-    if (isWeb || (!isNativePlatform && isLocalHost)) {
-      return environment.api.localBaseUrl;
-    }
-
-    // Native Android dev uses the machine LAN IP instead of 127.0.0.1 so it
-    // works even when adb reverse is unreliable.
-    if (isAndroid && !environment.production) {
-      return nativeLocalBaseUrl;
-    }
-
     return environment.api.remoteBaseUrl;
   }
 
